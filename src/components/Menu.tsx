@@ -1,3 +1,7 @@
+import MenuTitle from "./MenuTitle";
+import MenuItem from "./MenuItem";
+
+import { role } from "../lib/data";
 const menuItems = [
   {
     title: "MENU",
@@ -112,3 +116,30 @@ const menuItems = [
     ],
   },
 ];
+
+export default function Menu() {
+  return (
+    <div className="mt-4 text-sm">
+      {menuItems.map((item) => (
+        <div key={item.title} className="flex flex-col gap-2">
+          <MenuTitle
+            title={item.title}
+            className="hidden lg:block text-gray-400 font-light my-4"
+          />
+          {item.items.map((item) => {
+            if (item.visible.includes(role)) {
+              return (
+                <MenuItem
+                  key={item.label}
+                  label={item.label}
+                  icon={item.icon}
+                  path={item.href}
+                />
+              );
+            }
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
