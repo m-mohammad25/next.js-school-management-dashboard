@@ -20,4 +20,4 @@ Besides using Next.js capabilities to implement this dashboard, I have included 
 
 I'm currently developing this dashboard to make it fetch real data using **Prisma** from **PostgeSQL** database already which I have deployed using **Docker**
 
-You watch a live version of this project by clicking [here](https://m-mohammad25.github.io/ECommerce-App-with-React-TypeScript/)
+You can watch a live version of this project by clicking [here](https://next-js-school-management-dashboard.vercel.app)
