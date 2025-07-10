@@ -4,8 +4,11 @@ This project is a school management dashboard built with Next.js and TypeScript.
 which includes tables and charts.
 
 ![Teachers List Page](./src/assets/catalogue/teacher_list.jpeg)
+<br />
 ![Teacher Page](./src/assets/catalogue/teacher_page.jpeg)
+<br />
 ![Student Page](./src/assets/catalogue/student_page.jpeg)
+<br />
 ![Exams Page](./src/assets/catalogue/exams_list.jpeg)
 
 Besides using Next.js capabilities to implement this dashboard, I have included many modern js packeges in this project:
