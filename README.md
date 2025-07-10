@@ -1,7 +1,20 @@
 # Next.js School Management Dashboard (in progress)
 
-This project is a school management dashboard built with Next.js and TypeScript. It includes features such as managing student, teachers and viewing their related exams & assignments. In addtion to adding anouncements, checking attendece, and more. It is supported with a rich UI
-which includes tables and charts.
+A modern **Next.js** and **TypeScript** web application designed to revolutionize school administration. The dashboard offers comprehensive tools for educators and administrators with:
+
+## ✨ Key Features
+
+- **User Management**: Full CRUD operations for students, teachers and parents.
+- **Academic Tracking**:
+  - Exam and assignment management
+  - Attendance monitoring
+- **Communication Center**:
+  - Announcement system
+  - Event calendar
+  - Notifications
+- **Data Visualization**:
+  - Interactive charts (progress, attendance trends)
+  - Dynamic Calendars
 
 ![Teachers List Page](./src/assets/catalogue/teacher_list.jpeg)
 
