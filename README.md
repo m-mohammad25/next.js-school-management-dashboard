@@ -3,13 +3,21 @@
 This project is a school management dashboard built with Next.js and TypeScript. It includes features such as managing student, teachers and viewing their related exams & assigments. In addtion to adding anouncements, checking attendece, and more. It is supported with a rich UI
 which includes tables and charts.
 
+<div style="margin-top: 30px">
 ![Teachers List Page](./src/assets/catalogue/teacher_list.jpeg)
-<br />
+</div>
+
+<div style="margin-top: 30px">
 ![Teacher Page](./src/assets/catalogue/teacher_page.jpeg)
-<br />
+</div>
+
+<div style="margin-top: 30px">
 ![Student Page](./src/assets/catalogue/student_page.jpeg)
-<br />
+</div>
+
+<div style="margin-top: 30px; margin-bottom: 30px">
 ![Exams Page](./src/assets/catalogue/exams_list.jpeg)
+</div>
 
 Besides using Next.js capabilities to implement this dashboard, I have included many modern js packeges in this project:
 
