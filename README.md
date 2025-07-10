@@ -1,26 +1,20 @@
-# Lama Dev School Management Dashboard
+# Next.js School Management Dashboard (in progress)
 
-## Getting Started
+This project is a school management dashboard built with Next.js and TypeScript. It includes features such as managing student, teachers and viewing their related exams & assigments. In addtion to adding anouncements, checking attendece, and more. It is supported with a rich UI
+which includes tables and charts.
 
-First, run the development server:
+![Teachers List Page](./src/assets/catalogue/teacher_list.jpeg)
+![Teacher Page](./src/assets/catalogue/teacher_page.jpeg)
+![Student Page](./src/assets/catalogue/student_page.jpeg)
+![Exams Page](./src/assets/catalogue/exams_list.jpeg)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Besides using Next.js capabilities to implement this dashboard, I have included many modern js packeges in this project:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **TypeScript** for type safety
+- **TailwindCSS**
+- **React-hook-form** and **Zod** for validating form
+- **React-Calendar** and **React-Big-Calendar** for displaying beatiful caledars
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+I'm currently developing this dashboard to make it fetch real data using **Prisma** from **PostgeSQL** database already which I have deployed using **Docker**
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Lama Dev Youtube Channel](https://youtube.com/lamadev) 
-- [Next.js](https://nextjs.org/learn)
+You watch a live version of this project by clicking [here](https://m-mohammad25.github.io/ECommerce-App-with-React-TypeScript/)
