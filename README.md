@@ -16,11 +16,11 @@ A modern **Next.js** and **TypeScript** web application designed to revolutioniz
   - Interactive charts (progress, attendance trends)
   - Dynamic Calendars
 
-![Teachers List Page](./src/assets/catalogue/teacher_list.jpeg)
-
-![Teacher Page](./src/assets/catalogue/teacher_page.jpeg)
+![Admin Page](./src/assets/catalogue/admin_page.jpeg)
 
 ![Student Page](./src/assets/catalogue/student_page.jpeg)
+
+![Teachers List Page](./src/assets/catalogue/teacher_list.jpeg)
 
 ![Exams Page](./src/assets/catalogue/exams_list.jpeg)
 

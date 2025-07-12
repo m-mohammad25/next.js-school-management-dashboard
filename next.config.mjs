@@ -5,7 +5,7 @@ const nextConfig = {
   },
   redirects: async () => [
     // I have added this temporarly to redirect to the teachers page
-    { source: "/", destination: "/list/teachers", permanent: false },
+    { source: "/", destination: "/admin", permanent: false },
   ],
 };
 
