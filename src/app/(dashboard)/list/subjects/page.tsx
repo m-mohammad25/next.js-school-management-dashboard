@@ -1,13 +1,11 @@
 import { FormModal, Pagination, Table, TableSearch } from "@/components";
 import { role, subjectsData } from "@/lib/data";
+import prisma from "@/lib/prisma";
+import { ITEMS_PER_PAGE } from "@/lib/settings";
+import { Prisma, Subject, Teacher } from "@prisma/client";
 import Image from "next/image";
-import Link from "next/link";
 
-type Subject = {
-  id: number;
-  name: string;
-  teachers: string[];
-};
+type SubjectList = Subject & { teachers: Teacher[] };
 
 const columns = [
   {
@@ -25,26 +23,67 @@ const columns = [
   },
 ];
 
-function SubjectsListPage() {
-  const renderRow = (subject: Subject) => (
-    <tr
-      key={subject.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-    >
-      <td className="flex subjects-center gap-4 p-4">{subject.name}</td>
-      <td className="hidden md:table-cell">{subject.teachers.join(",")}</td>
-      <td>
-        <div className="flex items-center gap-2">
-          {role === "admin" && (
-            <>
-              <FormModal table="subject" type="update" data={subject} />
-              <FormModal table="subject" type="delete" id={subject.id} />
-            </>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
+const renderRow = (subject: SubjectList) => (
+  <tr
+    key={subject.id}
+    className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+  >
+    <td className="flex subjects-center gap-4 p-4">{subject.name}</td>
+    <td className="hidden md:table-cell">
+      {subject.teachers.map((teacher) => teacher.name).join(", ")}
+    </td>
+    <td>
+      <div className="flex items-center gap-2">
+        {role === "admin" && (
+          <>
+            <FormModal table="subject" type="update" data={subject} />
+            <FormModal table="subject" type="delete" id={subject.id} />
+          </>
+        )}
+      </div>
+    </td>
+  </tr>
+);
+async function SubjectsListPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) {
+  const { page, ...queryParams } = searchParams;
+
+  const pageNumber = page ? parseInt(page) : 1;
+
+  // URL Query Params Condition
+
+  const query: Prisma.SubjectWhereInput = {};
+
+  for (let [key, value] of Object.entries(queryParams)) {
+    if (value != undefined) {
+      switch (key) {
+        case "search":
+          query.name = { contains: value, mode: "insensitive" };
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  const [data, count] = await prisma.$transaction([
+    prisma.subject.findMany({
+      where: query,
+      include: {
+        teachers: true,
+      },
+      take: ITEMS_PER_PAGE,
+      skip: ITEMS_PER_PAGE * (pageNumber - 1),
+    }),
+
+    prisma.subject.count({
+      where: query,
+    }),
+  ]);
+
   return (
     <div className="bg-white flex-1 m-4 mt-4 roudned-md p-4">
       {/* TOP  */}
@@ -68,11 +107,11 @@ function SubjectsListPage() {
 
       {/* LIST */}
       <div>
-        <Table columns={columns} renderRow={renderRow} data={subjectsData} />
+        <Table columns={columns} renderRow={renderRow} data={data} />
       </div>
 
       {/* Pagination  */}
-      <Pagination />
+      <Pagination pageNumber={pageNumber} count={count} />
     </div>
   );
 }
