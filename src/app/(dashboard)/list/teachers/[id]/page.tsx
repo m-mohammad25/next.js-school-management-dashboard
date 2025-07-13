@@ -167,10 +167,16 @@ function SingleTeacherPage() {
             >
               Teacher's Lessons
             </Link>
-            <Link className="p-4 rounded-md bg-pink-50" href="/">
+            <Link
+              className="p-4 rounded-md bg-pink-50"
+              href={`/list/exams?teacherId=${"teacher12"}`}
+            >
               Teacher's Exams
             </Link>
-            <Link className="p-4 rounded-md bg-lamaSkyLight" href="/">
+            <Link
+              className="p-4 rounded-md bg-lamaSkyLight"
+              href={`/list/assignments?teacherId=${"teacher12"}`}
+            >
               Teacher's Assignments
             </Link>
           </div>
