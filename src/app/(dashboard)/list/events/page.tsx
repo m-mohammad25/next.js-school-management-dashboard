@@ -1,15 +1,11 @@
 import { FormModal, Pagination, Table, TableSearch } from "@/components";
 import { eventsData, role } from "@/lib/data";
+import prisma from "@/lib/prisma";
+import { ITEMS_PER_PAGE } from "@/lib/settings";
+import { Class, Event, Prisma } from "@prisma/client";
 import Image from "next/image";
 
-type Event = {
-  id: number;
-  title: string;
-  class: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-};
+type EventList = Event & { class: Class };
 
 const columns = [
   {
@@ -41,29 +37,83 @@ const columns = [
   },
 ];
 
-function EventsListPage() {
-  const renderRow = (event: Event) => (
-    <tr
-      key={event.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-    >
-      <td className="flex events-center gap-4 p-4">{event.title}</td>
-      <td>{event.class}</td>
-      <td className="hidden md:table-cell">{event.date}</td>
-      <td className="hidden md:table-cell">{event.startTime}</td>
-      <td className="hidden md:table-cell">{event.endTime}</td>
-      <td>
-        <div className="flex items-center gap-2">
-          {role === "admin" && (
-            <>
-              <FormModal table="event" type="update" data={event} />
-              <FormModal table="event" type="delete" id={event.id} />
-            </>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
+const renderRow = (event: EventList) => (
+  <tr
+    key={event.id}
+    className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+  >
+    <td className="flex events-center gap-4 p-4">{event.title}</td>
+    <td>{event.class.name}</td>
+    <td className="hidden md:table-cell">
+      {new Intl.DateTimeFormat("en-US").format(event.startTime)}
+    </td>
+    <td className="hidden md:table-cell">
+      {event.startTime.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })}
+    </td>
+    <td className="hidden md:table-cell">
+      {" "}
+      {event.endTime.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })}
+    </td>
+    <td>
+      <div className="flex items-center gap-2">
+        {role === "admin" && (
+          <>
+            <FormModal table="event" type="update" data={event} />
+            <FormModal table="event" type="delete" id={event.id} />
+          </>
+        )}
+      </div>
+    </td>
+  </tr>
+);
+async function EventsListPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) {
+  const { page, ...queryParams } = searchParams;
+
+  const pageNumber = page ? parseInt(page) : 1;
+
+  // URL Query Params Condition
+
+  const query: Prisma.EventWhereInput = {};
+
+  for (let [key, value] of Object.entries(queryParams)) {
+    if (value != undefined) {
+      switch (key) {
+        case "search":
+          query.title = { contains: value, mode: "insensitive" };
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  const [data, count] = await prisma.$transaction([
+    prisma.event.findMany({
+      where: query,
+      include: {
+        class: { select: { name: true } },
+      },
+      take: ITEMS_PER_PAGE,
+      skip: ITEMS_PER_PAGE * (pageNumber - 1),
+    }),
+
+    prisma.event.count({
+      where: query,
+    }),
+  ]);
+
   return (
     <div className="bg-white flex-1 m-4 mt-4 roudned-md p-4">
       {/* TOP  */}
@@ -87,11 +137,11 @@ function EventsListPage() {
 
       {/* LIST */}
       <div>
-        <Table columns={columns} renderRow={renderRow} data={eventsData} />
+        <Table columns={columns} renderRow={renderRow} data={data} />
       </div>
 
       {/* Pagination  */}
-      <Pagination />
+      <Pagination count={count} pageNumber={pageNumber} />
     </div>
   );
 }
