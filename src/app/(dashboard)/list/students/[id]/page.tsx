@@ -1,4 +1,6 @@
-import { Announcements, BigCalnedar, PreformanceChart } from "@/components";
+import Announcements from "@/components/Announcements";
+import BigCalnedar from "@/components/BigCalendar";
+import PreformanceChart from "@/components/PreformanceChart";
 import Image from "next/image";
 import Link from "next/link";
 

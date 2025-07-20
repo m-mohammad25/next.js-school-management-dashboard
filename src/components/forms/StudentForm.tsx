@@ -1,10 +1,11 @@
 "use client";
 
+import InputField from "@/components/InputField";
+
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { InputField } from "@/components";
 
 const schema = z.object({
   username: z

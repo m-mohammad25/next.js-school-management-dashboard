@@ -1,7 +1,11 @@
+import FormModal from "@/components/FormModal";
+import Pagination from "@/components/Pagination";
+import Table from "@/components/Table";
+import TableSearch from "@/components/TableSearch";
+
 import { Class, Prisma, Student } from "@prisma/client";
 import prisma from "@/lib/prisma";
 
-import { FormModal, Pagination, Table, TableSearch } from "@/components";
 import { role } from "@/lib/data";
 import Image from "next/image";
 import Link from "next/link";

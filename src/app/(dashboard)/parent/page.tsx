@@ -1,4 +1,5 @@
-import { Announcements, BigCalnedar } from "@/components";
+import Announcements from "@/components/Announcements";
+import BigCalnedar from "@/components/BigCalendar";
 
 const TeacherPage = () => {
   return (

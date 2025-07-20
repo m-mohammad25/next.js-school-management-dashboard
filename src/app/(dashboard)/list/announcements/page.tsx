@@ -1,64 +1,78 @@
-import { FormModal, Pagination, Table, TableSearch } from "@/components";
-import { announcementsData, role } from "@/lib/data";
-import prisma from "@/lib/prisma";
-import { ITEMS_PER_PAGE } from "@/lib/settings";
-import { Announcement, Class, Prisma } from "@prisma/client";
-import { count } from "console";
 import Image from "next/image";
+import prisma from "@/lib/prisma";
+import { Announcement, Class, Prisma } from "@prisma/client";
+import { currentUser } from "@clerk/nextjs/server";
+import { ITEMS_PER_PAGE } from "@/lib/settings";
+
+import FormModal from "@/components/FormModal";
+import Pagination from "@/components/Pagination";
+import Table from "@/components/Table";
+import TableSearch from "@/components/TableSearch";
 
 type AnnouncementList = Announcement & { class: Class };
-
-const columns = [
-  {
-    header: "Title",
-    accessor: "title",
-  },
-  {
-    header: "Class",
-    accessor: "class",
-  },
-  {
-    header: "Date",
-    accessor: "date",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
-];
-const renderRow = (announcement: AnnouncementList) => (
-  <tr
-    key={announcement.id}
-    className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-  >
-    <td className="flex items-center gap-4 p-4">{announcement.title}</td>
-    <td>{announcement.class.name}</td>
-    <td className="hidden md:table-cell">
-      {new Intl.DateTimeFormat("en-US").format(announcement.date)}
-    </td>
-    <td>
-      <div className="flex items-center gap-2">
-        {role === "admin" && (
-          <>
-            <FormModal table="announcement" type="update" data={announcement} />
-            <FormModal
-              table="announcement"
-              type="delete"
-              id={announcement.id}
-            />
-          </>
-        )}
-      </div>
-    </td>
-  </tr>
-);
 
 async function AnnouncementsListPage({
   searchParams,
 }: {
   searchParams: { [key: string]: string | undefined };
 }) {
+  const user = await currentUser();
+  const role = user?.publicMetadata.role as string;
+
+  const columns = [
+    {
+      header: "Title",
+      accessor: "title",
+    },
+    {
+      header: "Class",
+      accessor: "class",
+    },
+    {
+      header: "Date",
+      accessor: "date",
+      className: "hidden md:table-cell",
+    },
+
+    ...(role === "admin"
+      ? [
+          {
+            header: "Actions",
+            accessor: "action",
+          },
+        ]
+      : []),
+  ];
+  const renderRow = (announcement: AnnouncementList) => (
+    <tr
+      key={announcement.id}
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+    >
+      <td className="flex items-center gap-4 p-4">{announcement.title}</td>
+      <td>{announcement.class.name}</td>
+      <td className="hidden md:table-cell">
+        {new Intl.DateTimeFormat("en-US").format(announcement.date)}
+      </td>
+      <td>
+        <div className="flex items-center gap-2">
+          {role === "admin" && (
+            <>
+              <FormModal
+                table="announcement"
+                type="update"
+                data={announcement}
+              />
+              <FormModal
+                table="announcement"
+                type="delete"
+                id={announcement.id}
+              />
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
   const { page, ...queryParams } = searchParams;
 
   const pageNumber = page ? parseInt(page) : 1;

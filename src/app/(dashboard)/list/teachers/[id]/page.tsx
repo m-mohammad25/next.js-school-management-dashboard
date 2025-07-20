@@ -1,9 +1,7 @@
-import {
-  Announcements,
-  BigCalnedar,
-  FormModal,
-  PreformanceChart,
-} from "@/components";
+import FormModal from "@/components/FormModal";
+import BigCalnedar from "@/components/BigCalendar";
+import Announcements from "@/components/Announcements";
+import PreformanceChart from "@/components/PreformanceChart";
 import Image from "next/image";
 import Link from "next/link";
 
