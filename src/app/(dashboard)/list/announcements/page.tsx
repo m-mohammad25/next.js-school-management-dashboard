@@ -1,8 +1,8 @@
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { Announcement, Class, Prisma } from "@prisma/client";
-import { currentUser } from "@clerk/nextjs/server";
 import { ITEMS_PER_PAGE } from "@/lib/settings";
+import { getUserRole } from "@/lib/utils";
 
 import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
@@ -16,8 +16,7 @@ async function AnnouncementsListPage({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) {
-  const user = await currentUser();
-  const role = user?.publicMetadata.role as string;
+  const role = await getUserRole();
 
   const columns = [
     {
