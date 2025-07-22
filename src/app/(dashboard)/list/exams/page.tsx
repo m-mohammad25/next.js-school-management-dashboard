@@ -5,8 +5,10 @@ import TableSearch from "@/components/TableSearch";
 import { examsData, role } from "@/lib/data";
 import prisma from "@/lib/prisma";
 import { ITEMS_PER_PAGE } from "@/lib/settings";
+import { getUserId, getUserRole } from "@/lib/utils";
 import { Class, Exam, Prisma, Subject, Teacher } from "@prisma/client";
 import Image from "next/image";
+import { keyof } from "zod/v4-mini";
 
 type ExamList = Exam & {
   lesson: {
@@ -70,6 +72,9 @@ async function ExamsListPage({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) {
+  const role = await getUserRole();
+  const userId = await getUserId();
+
   const { page, ...queryParams } = searchParams;
 
   const pageNumber = page ? parseInt(page) : 1;
@@ -77,21 +82,22 @@ async function ExamsListPage({
   // URL Query Params Condition
 
   const query: Prisma.ExamWhereInput = {};
+  query.lesson = {};
 
   for (let [key, value] of Object.entries(queryParams)) {
     if (value != undefined) {
       switch (key) {
         case "teacherId":
-          query.lesson = { teacherId: value };
+          query.lesson.teacherId = value;
           break;
 
         case "classId":
-          query.lesson = { classId: parseInt(value) };
+          query.lesson.classId = parseInt(value);
           break;
 
         case "search":
-          query.lesson = {
-            subject: { name: { contains: value, mode: "insensitive" } },
+          query.lesson.subject = {
+            name: { contains: value, mode: "insensitive" },
           };
           break;
 
@@ -100,6 +106,16 @@ async function ExamsListPage({
       }
     }
   }
+
+  // Role Conditions
+
+  const roleConditions = {
+    teacher: { teacherId: userId! },
+    student: { class: { students: { some: { id: userId! } } } },
+    parent: { class: { students: { some: { parentId: userId! } } } },
+  };
+
+  query.lesson = roleConditions[role as keyof typeof roleConditions];
 
   const [data, count] = await prisma.$transaction([
     prisma.exam.findMany({

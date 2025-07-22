@@ -2,7 +2,7 @@ import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { Announcement, Class, Prisma } from "@prisma/client";
 import { ITEMS_PER_PAGE } from "@/lib/settings";
-import { getUserRole } from "@/lib/utils";
+import { getUserId, getUserRole } from "@/lib/utils";
 
 import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
@@ -17,6 +17,7 @@ async function AnnouncementsListPage({
   searchParams: { [key: string]: string | undefined };
 }) {
   const role = await getUserRole();
+  const userId = await getUserId();
 
   const columns = [
     {
@@ -48,7 +49,7 @@ async function AnnouncementsListPage({
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
     >
       <td className="flex items-center gap-4 p-4">{announcement.title}</td>
-      <td>{announcement.class.name}</td>
+      <td>{announcement.class?.name || "-"}</td>
       <td className="hidden md:table-cell">
         {new Intl.DateTimeFormat("en-US").format(announcement.date)}
       </td>
@@ -91,6 +92,21 @@ async function AnnouncementsListPage({
       }
     }
   }
+
+  // Role Conditions
+
+  const roleConditions = {
+    teacher: { lessons: { some: { teacherId: userId! } } },
+    student: { students: { some: { id: userId! } } },
+    parent: { students: { some: { parentId: userId! } } },
+  };
+
+  query.OR = [
+    { classId: null },
+    {
+      class: roleConditions[role as keyof typeof roleConditions] || {}, // {} fetch every thing in case the role of admin
+    },
+  ];
 
   const [data, count] = await prisma.$transaction([
     prisma.announcement.findMany({
