@@ -1,6 +1,18 @@
+import prisma from "@/lib/prisma";
 import Image from "next/image";
 
-const UserCart = ({ type }: { type: string }) => {
+const UserCart = async ({
+  type,
+}: {
+  type: "teacher" | "student" | "admin" | "parent";
+}) => {
+  const modelMap: Record<typeof type, any> = {
+    teacher: prisma.teacher,
+    student: prisma.student,
+    admin: prisma.admin,
+    parent: prisma.parent,
+  };
+  const count = await modelMap[type].count();
   return (
     <div className="rounded-2xl p-4 even:bg-lamaYellow odd:bg-lamaPurple flex-1">
       <div className="flex items-center justify-between">
@@ -9,7 +21,7 @@ const UserCart = ({ type }: { type: string }) => {
         </span>
         <Image src="/more.png" alt="more" width={20} height={20} />
       </div>
-      <h1 className="text-2xl font-semibold my-4">1,234</h1>
+      <h1 className="text-2xl font-semibold my-4">{count}</h1>
       <h2 className="capitalize text-sm font-medium text-gray-500">{type}s</h2>
     </div>
   );

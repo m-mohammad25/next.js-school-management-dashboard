@@ -8,7 +8,6 @@ import { ITEMS_PER_PAGE } from "@/lib/settings";
 import { getUserId, getUserRole } from "@/lib/utils";
 import { Class, Exam, Prisma, Subject, Teacher } from "@prisma/client";
 import Image from "next/image";
-import { keyof } from "zod/v4-mini";
 
 type ExamList = Exam & {
   lesson: {
@@ -154,7 +153,9 @@ async function ExamsListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            <FormModal table="exam" type="create" />
+            {(role === "admin" || role === "teacher") && (
+              <FormModal table="exam" type="create" />
+            )}
           </div>
         </div>
       </div>

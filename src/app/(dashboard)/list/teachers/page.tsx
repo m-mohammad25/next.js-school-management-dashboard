@@ -41,10 +41,14 @@ const columns = [
     accessor: "address",
     className: "hidden lg:table-cell",
   },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
+  ...(role === "admin"
+    ? [
+        {
+          header: "Actions",
+          accessor: "action",
+        },
+      ]
+    : []),
 ];
 const renderRow = (teacher: TeacherList) => (
   <tr
@@ -149,7 +153,7 @@ async function TeachersListPage({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
-            <FormModal table="teacher" type="create" />
+            {role === "admin" && <FormModal table="teacher" type="create" />}
           </div>
         </div>
       </div>
