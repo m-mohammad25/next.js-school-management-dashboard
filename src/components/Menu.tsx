@@ -1,6 +1,6 @@
 import MenuTitle from "./MenuTitle";
 import MenuItem from "./MenuItem";
-import { currentUser } from "@clerk/nextjs/server";
+import { getUserRole } from "@/lib/utils";
 
 const menuItems = [
   {
@@ -118,8 +118,7 @@ const menuItems = [
 ];
 
 export default async function Menu() {
-  const user = await currentUser();
-  const role = user?.publicMetadata.role as string;
+  const role = await getUserRole();
 
   return (
     <div className="mt-4 text-sm">

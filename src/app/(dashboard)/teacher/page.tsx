@@ -1,14 +1,16 @@
 import Announcements from "@/components/Announcements";
-import BigCalnedar from "@/components/BigCalendar";
+import BigCalendarContainer from "@/components/BigCalendarContainer";
+import { getUserId } from "@/lib/utils";
 
-const TeacherPage = () => {
+const TeacherPage = async () => {
+  const userId = await getUserId();
   return (
     <div className="flex flex-col xl:flex-row p-4 gap-4 flex-1">
       {/* Left  */}
       <div className="w-full xl:w-2/3">
         <div className="bg-white h-full p-4 rounded-md">
           <h1 className="text-xl font-semibold">Schedule (4A)</h1>
-          <BigCalnedar />
+          <BigCalendarContainer type="teacherId" id={userId!} />
         </div>
       </div>
       {/* Right */}
