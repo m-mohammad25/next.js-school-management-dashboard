@@ -1,14 +1,10 @@
 import Image from "next/image";
 import AttendenceChart from "./AttendenceChart";
 import prisma from "@/lib/prisma";
+import { getLatestMonday } from "@/lib/utils";
 
 async function AttendenceChartContainer() {
-  const today = new Date();
-  const dayWeek = today.getDay();
-  const daysSinceLastMonday = dayWeek === 0 ? 6 : dayWeek - 1; //if sunday, 6 days since the last monday
-  const lastMonday = new Date(today);
-
-  lastMonday.setDate(today.getDate() - daysSinceLastMonday);
+  const lastMonday = getLatestMonday();
 
   const resData = await prisma.attendance.findMany({
     where: {

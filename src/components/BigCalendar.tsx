@@ -28,7 +28,7 @@ const BigCalnedar = ({
       onView={handleOnViewChange}
       view={view}
       min={new Date(2025, 0, 1, 8, 0)}
-      max={new Date(2025, 0, 1, 17, 0)}
+      max={new Date(2025, 0, 1, 23, 0)}
     />
   );
 };

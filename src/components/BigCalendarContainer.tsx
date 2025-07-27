@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import useLessonsData from "@/hooks/useLessonsData";
 import BigCalnedar from "./BigCalendar";
 
 async function BigCalendarContainer({
@@ -8,17 +8,8 @@ async function BigCalendarContainer({
   type: "teacherId" | "classId";
   id: string | number;
 }) {
-  const dataRes = await prisma.lesson.findMany({
-    where: { [type]: id },
-  });
+  const adjustedLessonsData = await useLessonsData(type, id);
 
-  const lessonsData = dataRes.map((lesson) => ({
-    title: lesson.name,
-    allDay: false,
-    start: lesson.startTime,
-    end: lesson.endTime,
-  }));
-
-  return <BigCalnedar data={lessonsData} />;
+  return <BigCalnedar data={adjustedLessonsData} />;
 }
 export default BigCalendarContainer;
