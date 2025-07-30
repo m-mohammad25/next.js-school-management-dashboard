@@ -24,11 +24,10 @@ export const adjuctScheduleToCurrentWeek = (
   lessons: { title: string; allDay: boolean; start: Date; end: Date }[]
 ): { title: string; start: Date; allDay: boolean; end: Date }[] => {
   const lastMonday = getLatestMonday();
-
   return lessons.map((lesson) => {
     const lessonDayOfWeek = lesson.start.getDay();
     const daysSinceMonday = lessonDayOfWeek === 0 ? 6 : lessonDayOfWeek - 1;
-    const adjustedStartDate = lastMonday;
+    const adjustedStartDate = new Date(lastMonday);
 
     adjustedStartDate.setDate(lastMonday.getDate() + daysSinceMonday);
     adjustedStartDate.setHours(

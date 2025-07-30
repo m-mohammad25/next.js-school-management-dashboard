@@ -11,7 +11,7 @@ const localizer = momentLocalizer(moment);
 const BigCalnedar = ({
   data,
 }: {
-  data: { title: string; allDay: boolean; start: Date; end: Date }[];
+  data?: { title: string; allDay: boolean; start: Date; end: Date }[];
 }) => {
   const [view, setView] = useState<View>(Views.WORK_WEEK);
   const handleOnViewChange = (view: View) => {

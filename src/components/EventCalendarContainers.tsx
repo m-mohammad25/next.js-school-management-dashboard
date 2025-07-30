@@ -21,8 +21,6 @@ async function EventCalendarContainer({
     },
   });
 
-  console.log(eventsData);
-
   return (
     <div className="bg-white rounded-md p-4">
       <EventCalendar />
