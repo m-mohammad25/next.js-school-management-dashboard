@@ -2,9 +2,9 @@ import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import { role, subjectsData } from "@/lib/data";
 import prisma from "@/lib/prisma";
 import { ITEMS_PER_PAGE } from "@/lib/settings";
+import { getUserRole } from "@/lib/utils";
 import { Prisma, Subject, Teacher } from "@prisma/client";
 import Image from "next/image";
 
@@ -26,32 +26,33 @@ const columns = [
   },
 ];
 
-const renderRow = (subject: SubjectList) => (
-  <tr
-    key={subject.id}
-    className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-  >
-    <td className="flex subjects-center gap-4 p-4">{subject.name}</td>
-    <td className="hidden md:table-cell">
-      {subject.teachers.map((teacher) => teacher.name).join(", ")}
-    </td>
-    <td>
-      <div className="flex items-center gap-2">
-        {role === "admin" && (
-          <>
-            <FormModal table="subject" type="update" data={subject} />
-            <FormModal table="subject" type="delete" id={subject.id} />
-          </>
-        )}
-      </div>
-    </td>
-  </tr>
-);
 async function SubjectsListPage({
   searchParams,
 }: {
   searchParams: { [key: string]: string | undefined };
 }) {
+  const role = await getUserRole();
+  const renderRow = (subject: SubjectList) => (
+    <tr
+      key={subject.id}
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+    >
+      <td className="flex subjects-center gap-4 p-4">{subject.name}</td>
+      <td className="hidden md:table-cell">
+        {subject.teachers.map((teacher) => teacher.name).join(", ")}
+      </td>
+      <td>
+        <div className="flex items-center gap-2">
+          {role === "admin" && (
+            <>
+              <FormModal table="subject" type="update" data={subject} />
+              <FormModal table="subject" type="delete" id={subject.id} />
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
   const { page, ...queryParams } = searchParams;
 
   const pageNumber = page ? parseInt(page) : 1;
@@ -103,7 +104,7 @@ async function SubjectsListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            <FormModal table="subject" type="update" />
+            <FormModal table="subject" type="create" />
           </div>
         </div>
       </div>
