@@ -1,22 +1,25 @@
 "use client";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
 import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "@/components/InputField";
-import { createSubject } from "../actions";
+import { createSubject, updateSubject } from "../actions";
 import {
   SubjectFormInputsTypes,
   subjectSchema,
 } from "../formsValidationSchemas";
-import { unknown } from "zod/v4-mini";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
-type TeacherFormProps = {
+type SubjectFormProps = {
+  setOpenModal: Dispatch<SetStateAction<boolean>>;
   type: "update" | "create";
   data?: any;
 };
-function TeacherForm({ type, data }: TeacherFormProps) {
+function SubjectForm({ setOpenModal, type, data }: SubjectFormProps) {
   const {
     register,
     handleSubmit,
@@ -25,13 +28,24 @@ function TeacherForm({ type, data }: TeacherFormProps) {
     resolver: zodResolver(subjectSchema),
   });
 
-  const [state, formAction] = useFormState(createSubject, {
-    success: false,
-    error: false,
-  });
+  const [state, formAction] = useFormState(
+    type === "create" ? createSubject : updateSubject,
+    {
+      success: false,
+      error: false,
+    }
+  );
+
+  const router = useRouter();
+  useEffect(() => {
+    if (state.success) {
+      toast(`Subject has been ${type}d sucessfully!`);
+      setOpenModal(false);
+      router.refresh();
+    }
+  }, [state]);
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
     formAction(data);
   });
 
@@ -49,6 +63,16 @@ function TeacherForm({ type, data }: TeacherFormProps) {
           register={register}
           error={errors?.name}
         />
+        {data && (
+          <InputField
+            label="id"
+            name="id"
+            defaultValue={data?.id}
+            register={register}
+            error={errors?.id}
+            hidden
+          />
+        )}
       </div>
       {state.error && (
         <span className="text-red-500">something went wrong!</span>
@@ -60,4 +84,4 @@ function TeacherForm({ type, data }: TeacherFormProps) {
   );
 }
 
-export default TeacherForm;
+export default SubjectForm;

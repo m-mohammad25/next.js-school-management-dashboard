@@ -1,9 +1,27 @@
 "use client";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useState } from "react";
-// import TeacherForm from "./forms/TeacherForm";
-// import StudentForm from "./forms/StudentForm";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useFormState } from "react-dom";
+import { deleteSubject } from "./actions";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+
+const deleteActionMap = {
+  subject: deleteSubject,
+  class: deleteSubject,
+  teacher: deleteSubject,
+  student: deleteSubject,
+  exam: deleteSubject,
+  // TODO: OTHER DELETE ACTIONS
+  parent: deleteSubject,
+  lesson: deleteSubject,
+  assignment: deleteSubject,
+  result: deleteSubject,
+  attendance: deleteSubject,
+  event: deleteSubject,
+  announcement: deleteSubject,
+};
 
 const SubjectForm = dynamic(() => import("./forms/SubjectForm"), {
   loading: () => <h1>Loading...</h1>,
@@ -35,29 +53,53 @@ type formModalProps = {
 };
 
 const forms: {
-  [key: string]: (type: "create" | "update", data?: any) => JSX.Element;
+  [key: string]: (
+    setOpenModal: Dispatch<SetStateAction<boolean>>,
+    type: "create" | "update",
+    data?: any
+  ) => JSX.Element;
 } = {
-  subject: (type, data) => <SubjectForm type={type} data={data} />,
-  teacher: (type, data) => <TeacherForm type={type} data={data} />,
-  student: (type, data) => <StudentForm type={type} data={data} />,
+  subject: (setOpenModal, type, data) => (
+    <SubjectForm type={type} data={data} setOpenModal={setOpenModal} />
+  ),
+  teacher: (setOpenModal, type, data) => (
+    <TeacherForm type={type} data={data} setOpenModal={setOpenModal} />
+  ),
+  student: (setOpenModal, type, data) => (
+    <StudentForm type={type} data={data} setOpenModal={setOpenModal} />
+  ),
 };
+
 function FormModal({ table, type, data, id }: formModalProps) {
   const [openModal, setOpenModal] = useState(false);
 
   const Form = () => {
+    const [state, deleteAction] = useFormState(deleteActionMap[table], {
+      success: false,
+      error: false,
+    });
+
+    const router = useRouter();
+    useEffect(() => {
+      if (state.success) {
+        toast(`Subject has been deleted sucessfully!`);
+        setOpenModal(false);
+        router.refresh();
+      }
+    }, [state]);
     return type === "delete" && id ? (
       <form
-        onSubmit={(e) => e.preventDefault()}
-        action=""
+        action={deleteAction}
         className="mt-3 flex flex-col items-center gap-4"
       >
+        <input type="text | number" name="id" value={id} hidden />
         <span className="text-center font-semibold">{`Are you sure you want to delete this ${table}? All data will be lost`}</span>
         <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none">
           Delete
         </button>
       </form>
     ) : type === "create" || type === "update" ? (
-      forms[table](type, data)
+      forms[table](setOpenModal, type, data)
     ) : (
       "NO FORM FOUND!"
     );
