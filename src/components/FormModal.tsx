@@ -6,6 +6,7 @@ import { useFormState } from "react-dom";
 import { deleteSubject } from "./actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { formModalContainerProps } from "./FormModalContainer";
 
 const deleteActionMap = {
   subject: deleteSubject,
@@ -33,44 +34,47 @@ const StudentForm = dynamic(() => import("./forms/StudentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 
-type formModalProps = {
-  table:
-    | "teacher"
-    | "student"
-    | "parent"
-    | "subject"
-    | "class"
-    | "lesson"
-    | "exam"
-    | "assignment"
-    | "result"
-    | "attendance"
-    | "event"
-    | "announcement";
-  type: "create" | "update" | "delete";
-  data?: any;
-  id?: number | string;
-};
-
 const forms: {
   [key: string]: (
     setOpenModal: Dispatch<SetStateAction<boolean>>,
     type: "create" | "update",
-    data?: any
+    data?: any,
+    relatedData?: any
   ) => JSX.Element;
 } = {
-  subject: (setOpenModal, type, data) => (
-    <SubjectForm type={type} data={data} setOpenModal={setOpenModal} />
+  subject: (setOpenModal, type, data, relatedData) => (
+    <SubjectForm
+      type={type}
+      data={data}
+      setOpenModal={setOpenModal}
+      relatedData={relatedData}
+    />
   ),
-  teacher: (setOpenModal, type, data) => (
-    <TeacherForm type={type} data={data} setOpenModal={setOpenModal} />
+  teacher: (setOpenModal, type, data, relatedData) => (
+    <TeacherForm
+      type={type}
+      data={data}
+      setOpenModal={setOpenModal}
+      relatedData={relatedData}
+    />
   ),
-  student: (setOpenModal, type, data) => (
-    <StudentForm type={type} data={data} setOpenModal={setOpenModal} />
+  student: (setOpenModal, type, data, relatedData) => (
+    <StudentForm
+      type={type}
+      data={data}
+      setOpenModal={setOpenModal}
+      relatedData={relatedData}
+    />
   ),
 };
 
-function FormModal({ table, type, data, id }: formModalProps) {
+function FormModal({
+  table,
+  type,
+  data,
+  id,
+  relatedData,
+}: formModalContainerProps & { relatedData?: any }) {
   const [openModal, setOpenModal] = useState(false);
 
   const Form = () => {
@@ -99,7 +103,7 @@ function FormModal({ table, type, data, id }: formModalProps) {
         </button>
       </form>
     ) : type === "create" || type === "update" ? (
-      forms[table](setOpenModal, type, data)
+      forms[table](setOpenModal, type, data, relatedData)
     ) : (
       "NO FORM FOUND!"
     );

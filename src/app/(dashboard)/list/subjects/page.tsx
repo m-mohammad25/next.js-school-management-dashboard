@@ -1,4 +1,4 @@
-import FormModal from "@/components/FormModal";
+import FormModalContainer from "@/components/FormModalContainer";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
@@ -45,8 +45,16 @@ async function SubjectsListPage({
         <div className="flex items-center gap-2">
           {role === "admin" && (
             <>
-              <FormModal table="subject" type="update" data={subject} />
-              <FormModal table="subject" type="delete" id={subject.id} />
+              <FormModalContainer
+                table="subject"
+                type="update"
+                data={subject}
+              />
+              <FormModalContainer
+                table="subject"
+                type="delete"
+                id={subject.id}
+              />
             </>
           )}
         </div>
@@ -104,7 +112,7 @@ async function SubjectsListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            <FormModal table="subject" type="create" />
+            <FormModalContainer table="subject" type="create" />
           </div>
         </div>
       </div>

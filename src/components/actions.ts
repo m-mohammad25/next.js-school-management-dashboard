@@ -13,12 +13,16 @@ export const createSubject = async (
     await prisma.subject.create({
       data: {
         name: data.name,
+        teachers: {
+          connect: data.teachers.map((teacherId) => ({
+            id: teacherId,
+          })),
+        },
       },
     });
 
     return { success: true, error: false };
   } catch (error) {
-    console.log(error);
     return { success: false, error: true };
   }
 };
@@ -32,12 +36,16 @@ export const updateSubject = async (
       where: { id: data.id },
       data: {
         name: data.name,
+        teachers: {
+          set: data.teachers.map((teacherId) => ({
+            id: teacherId,
+          })),
+        },
       },
     });
 
     return { success: true, error: false };
   } catch (error) {
-    console.log(error);
     return { success: false, error: true };
   }
 };
@@ -46,7 +54,6 @@ export const deleteSubject = async (
   currentState: CreateSubjectActionState,
   data: FormData
 ) => {
-  console.log("hello from delete action!");
   try {
     await prisma.subject.delete({
       where: { id: +data.get("id")! },
@@ -54,7 +61,6 @@ export const deleteSubject = async (
 
     return { success: true, error: false };
   } catch (error) {
-    console.log(error);
     return { success: false, error: true };
   }
 };

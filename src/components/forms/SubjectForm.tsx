@@ -18,8 +18,14 @@ type SubjectFormProps = {
   setOpenModal: Dispatch<SetStateAction<boolean>>;
   type: "update" | "create";
   data?: any;
+  relatedData?: any;
 };
-function SubjectForm({ setOpenModal, type, data }: SubjectFormProps) {
+function SubjectForm({
+  setOpenModal,
+  type,
+  data,
+  relatedData,
+}: SubjectFormProps) {
   const {
     register,
     handleSubmit,
@@ -73,6 +79,29 @@ function SubjectForm({ setOpenModal, type, data }: SubjectFormProps) {
             hidden
           />
         )}
+        <div className="flex flex-col gap-2 w-full md:w-1/4">
+          <label htmlFor="teachers" className="text-xs text-gray-500 gap-0">
+            teachers
+          </label>
+          <select
+            multiple
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            {...register("teachers")}
+            defaultValue={data?.teachers}
+          >
+            {relatedData.teachers.map(
+              (teacher: { id: string; name: string; surname: string }) => (
+                <option
+                  value={teacher.id}
+                  key={teacher.id}
+                >{`${teacher.name} ${teacher.surname}`}</option>
+              )
+            )}
+          </select>
+          {errors.teachers?.message && (
+            <p className="text-xs text-red-400">{errors.teachers?.message}</p>
+          )}
+        </div>
       </div>
       {state.error && (
         <span className="text-red-500">something went wrong!</span>
