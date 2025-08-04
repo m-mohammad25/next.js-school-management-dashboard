@@ -1,4 +1,4 @@
-import FormModal from "@/components/FormModal";
+import FormModalContainer from "@/components/FormModalContainer";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
@@ -59,7 +59,18 @@ async function ClassesListPage({
       <td>
         <div className="flex items-center gap-2">
           {role === "admin" && (
-            <FormModal table="class" type="delete" id={classItem.id} />
+            <>
+              <FormModalContainer
+                table="class"
+                type="update"
+                data={classItem}
+              />
+              <FormModalContainer
+                table="class"
+                type="delete"
+                id={classItem.id}
+              />
+            </>
           )}
         </div>
       </td>
@@ -122,7 +133,9 @@ async function ClassesListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {role === "admin" && <FormModal table="class" type="create" />}
+            {role === "admin" && (
+              <FormModalContainer table="class" type="create" />
+            )}
           </div>
         </div>
       </div>

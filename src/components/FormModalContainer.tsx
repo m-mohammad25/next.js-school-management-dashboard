@@ -28,9 +28,7 @@ async function FormModalContainer({
 }: formModalContainerProps) {
   let relatedData = {};
 
-  console.log("hey!");
   if (type !== "delete") {
-    console.log("hey!");
     switch (table) {
       case "subject":
         const subjectTeachers = await prisma.teacher.findMany({
@@ -41,8 +39,26 @@ async function FormModalContainer({
           },
         });
         relatedData = { teachers: subjectTeachers };
-        console.log(relatedData);
         break;
+
+      case "class":
+        const classTeachers = await prisma.teacher.findMany({
+          select: {
+            id: true,
+            name: true,
+            surname: true,
+          },
+        });
+
+        const grades = await prisma.grade.findMany({
+          select: {
+            id: true,
+            level: true,
+          },
+        });
+        relatedData = { teachers: classTeachers, grades };
+        break;
+
       default:
         break;
     }
