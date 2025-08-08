@@ -1,46 +1,62 @@
 "use client";
 
-import InputField from "@/components/InputField";
-import Image from "next/image";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CldUploadWidget } from "next-cloudinary";
 
-const schema = z.object({
-  username: z
-    .string()
-    .min(3, { message: "Username must be at least 3 characters long!" })
-    .max(20, { message: "Username can be 20 characters at most" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(8, { message: "password must be at least 8 characters" }),
-  firstName: z.string().min(1, { message: "First name is required" }),
-  lastName: z.string().min(1, { message: "Last name is required" }),
-  phone: z.string().min(1, { message: "Phone is required" }),
-  address: z.string().min(1, { message: "Address is required" }),
-  bloodType: z.string().min(1, { message: "Blood type is required" }),
-  birthday: z.date({ message: "Birthday is required" }),
-  sex: z.enum(["male", "female"], { message: "Sex is required" }),
-  img: z.instanceof(File, { message: "Image is required" }),
-});
+import InputField from "@/components/InputField";
 
-type InputTypes = z.infer<typeof schema>;
+import {
+  TeacherFormInputsTypes,
+  teacherSchema,
+} from "../formsValidationSchemas";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { createTeacher, updateTeacher } from "../actions";
+import Image from "next/image";
+
 type TeacherFormProps = {
+  setOpenModal: Dispatch<SetStateAction<boolean>>;
   type: "update" | "create";
   data?: any;
+  relatedData?: any;
 };
-function TeacherForm({ type, data }: TeacherFormProps) {
+function TeacherForm({
+  type,
+  data,
+  relatedData,
+  setOpenModal,
+}: TeacherFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<InputTypes>({
-    resolver: zodResolver(schema),
+  } = useForm<TeacherFormInputsTypes>({
+    resolver: zodResolver(teacherSchema),
   });
 
+  const [imgUrl, setImgUrl] = useState<any>();
+  const [state, formAction] = useFormState(
+    type === "create" ? createTeacher : updateTeacher,
+    {
+      success: false,
+      error: false,
+    }
+  );
+
+  const router = useRouter();
+  useEffect(() => {
+    if (state.success) {
+      toast(`Teacher has been ${type}d sucessfully!`);
+      setOpenModal(false);
+      router.refresh();
+    }
+  }, [state]);
+
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
+    formAction({ ...data, img: imgUrl });
   });
 
   return (
@@ -78,18 +94,18 @@ function TeacherForm({ type, data }: TeacherFormProps) {
       </span>
       <div className="flex justify-between flex-wrap gap-4">
         <InputField
-          label="First Name"
-          name="firstName"
-          defaultValue={data?.firstName}
+          label="Name"
+          name="name"
+          defaultValue={data?.name}
           register={register}
-          error={errors?.firstName}
+          error={errors?.name}
         />
         <InputField
-          label="Last Name"
-          name="lastName"
-          defaultValue={data?.lastName}
+          label="Surname"
+          name="surname"
+          defaultValue={data?.surname}
           register={register}
-          error={errors?.lastName}
+          error={errors?.surname}
         />
         <InputField
           label="Phone"
@@ -120,6 +136,17 @@ function TeacherForm({ type, data }: TeacherFormProps) {
           error={errors?.birthday}
           type="date"
         />
+        {data && (
+          <InputField
+            label="Id"
+            name="id"
+            defaultValue={data?.id}
+            register={register}
+            error={errors?.id}
+            hidden
+          />
+        )}
+
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label htmlFor="sex" className="text-xs text-gray-500 gap-0">
             Sex
@@ -129,27 +156,62 @@ function TeacherForm({ type, data }: TeacherFormProps) {
             {...register("sex")}
             defaultValue={data?.sex}
           >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option selected value="MALE">
+              Male
+            </option>
+            <option value="FEMALE">Female</option>
           </select>
           {errors.sex?.message && (
             <p className="text-xs text-red-400">{errors.sex?.message}</p>
           )}
         </div>
-        <div className="flex flex-col justify-center gap-2 w-full md:w-1/4">
-          <label
-            htmlFor="img"
-            className="text-xs text-gray-500 gap-2 cursor-pointer flex items-center justify-between"
-          >
-            <Image src="/upload.png" alt="upload" width={28} height={28} />
-            <span>upload an image</span>
+
+        <div className="flex flex-col gap-2 w-full md:w-1/4">
+          <label htmlFor="subjects" className="text-xs text-gray-500 gap-0">
+            subjects
           </label>
-          <input id="img" type="file" className="hidden" />
-          {errors.img?.message && (
-            <p className="text-xs text-red-400">{errors.img?.message}</p>
+          <select
+            multiple
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            {...register("subjects")}
+            defaultValue={data?.subjects}
+          >
+            {relatedData.teacherSubjects.map(
+              (subject: { id: string; name: string }) => (
+                <option value={subject.id} key={subject.id}>
+                  {subject.name}
+                </option>
+              )
+            )}
+          </select>
+          {errors.subjects?.message && (
+            <p className="text-xs text-red-400">{errors.subjects?.message}</p>
           )}
         </div>
+
+        <CldUploadWidget
+          uploadPreset="school"
+          onSuccess={(result, { widget }) => {
+            setImgUrl(result.info?.secure_url);
+            widget.close();
+          }}
+        >
+          {({ open }) => {
+            return (
+              <label
+                className="text-xs text-gray-500 gap-2 cursor-pointer flex items-center justify-between"
+                onClick={() => open()}
+              >
+                <Image src="/upload.png" alt="upload" width={28} height={28} />
+                <span>upload an image</span>
+              </label>
+            );
+          }}
+        </CldUploadWidget>
       </div>
+      {state.error && (
+        <span className="text-red-500">something went wrong!</span>
+      )}
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "create" : "update"}
       </button>

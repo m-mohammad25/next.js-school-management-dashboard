@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
-import { deleteClass, deleteSubject } from "./actions";
+import { deleteClass, deleteSubject, deleteTeacher } from "./actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { formModalContainerProps } from "./FormModalContainer";
@@ -11,7 +11,7 @@ import { formModalContainerProps } from "./FormModalContainer";
 const deleteActionMap = {
   subject: deleteSubject,
   class: deleteClass,
-  teacher: deleteSubject,
+  teacher: deleteTeacher,
   student: deleteSubject,
   exam: deleteSubject,
   // TODO: OTHER DELETE ACTIONS
@@ -63,14 +63,14 @@ const forms: {
       relatedData={relatedData}
     />
   ),
-  // teacher: (setOpenModal, type, data, relatedData) => (
-  //   <TeacherForm
-  //     type={type}
-  //     data={data}
-  //     setOpenModal={setOpenModal}
-  //     relatedData={relatedData}
-  //   />
-  // ),
+  teacher: (setOpenModal, type, data, relatedData) => (
+    <TeacherForm
+      type={type}
+      data={data}
+      setOpenModal={setOpenModal}
+      relatedData={relatedData}
+    />
+  ),
   // student: (setOpenModal, type, data, relatedData) => (
   //   <StudentForm
   //     type={type}

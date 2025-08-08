@@ -1,4 +1,4 @@
-import FormModal from "@/components/FormModal";
+import FormModalContainer from "@/components/FormModalContainer";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
@@ -87,7 +87,11 @@ const renderRow = (teacher: TeacherList) => (
       </Link>
 
       {role == "admin" && (
-        <FormModal table="teacher" type="delete" id={Number(teacher.id)} />
+        <FormModalContainer
+          table="teacher"
+          type="delete"
+          id={Number(teacher.id)}
+        />
       )}
     </td>
   </tr>
@@ -153,7 +157,9 @@ async function TeachersListPage({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="teacher" type="create" />}
+            {role === "admin" && (
+              <FormModalContainer table="teacher" type="create" />
+            )}
           </div>
         </div>
       </div>
