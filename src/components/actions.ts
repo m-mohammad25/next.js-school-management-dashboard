@@ -127,8 +127,6 @@ export const createTeacher = async (
   data: TeacherFormInputsTypes
 ) => {
   try {
-    console.log("hey before");
-    console.log(data);
     const clerk = await clerkClient();
     const user = await clerk.users.createUser({
       username: data.username,
@@ -138,8 +136,6 @@ export const createTeacher = async (
       publicMetadata: { role: "teacher" },
     });
 
-    console.log("hey after");
-    console.log(user);
     await prisma.teacher.create({
       data: {
         id: user.id,
@@ -171,13 +167,40 @@ export const updateTeacher = async (
   data: TeacherFormInputsTypes
 ) => {
   try {
+    if (!data.id) return { success: false, error: true };
+
+    const clerk = await clerkClient();
+    const user = await clerk.users.updateUser(data.id, {
+      ...(data.password !== "" && { password: data.password }),
+      username: data.username,
+      firstName: data.name,
+      lastName: data.surname,
+      publicMetadata: { role: "teacher" },
+    });
+
     await prisma.teacher.update({
       where: { id: data.id },
-      data,
+      data: {
+        id: user.id,
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        img: data.img,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        subjects: {
+          set: data.subjects?.map((subjectId) => ({ id: +subjectId })),
+        },
+        birthday: data.birthday,
+      },
     });
 
     return { success: true, error: false };
   } catch (error) {
+    console.log(error);
     return { success: false, error: true };
   }
 };
@@ -186,9 +209,12 @@ export const deleteTeacher = async (
   currentState: CreateSubjectActionState,
   data: FormData
 ) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true };
+
   try {
     await prisma.teacher.delete({
-      where: { id: +data.get("id")! },
+      where: { id: id },
     });
 
     return { success: true, error: false };

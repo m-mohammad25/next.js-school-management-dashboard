@@ -99,7 +99,7 @@ function FormModal({
     const router = useRouter();
     useEffect(() => {
       if (state.success) {
-        toast(`Subject has been deleted sucessfully!`);
+        toast(`${table} has been deleted sucessfully!`);
         setOpenModal(false);
         router.refresh();
       }

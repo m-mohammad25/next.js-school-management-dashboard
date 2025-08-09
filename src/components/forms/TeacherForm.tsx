@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { createTeacher, updateTeacher } from "../actions";
 import Image from "next/image";
+import { formatDate } from "@/lib/utils";
 
 type TeacherFormProps = {
   setOpenModal: Dispatch<SetStateAction<boolean>>;
@@ -131,7 +132,7 @@ function TeacherForm({
         <InputField
           label="Birthday"
           name="birthday"
-          defaultValue={data?.birthday}
+          defaultValue={data?.birthday.toISOString().split("T")[0]}
           register={register}
           error={errors?.birthday}
           type="date"
