@@ -1,11 +1,10 @@
 import prisma from "@/lib/prisma";
-import {
-  adjuctScheduleToCurrentWeek,
-  getUserId,
-  getUserRole,
-} from "@/lib/utils";
+import { adjuctScheduleToCurrentWeek } from "@/lib/utils";
 
-const useLessonsData = async (): Promise<
+const useLessonsData = async (
+  type: "teacherId" | "classId",
+  id: string | number
+): Promise<
   | {
       title: string;
       start: Date;
@@ -14,39 +13,24 @@ const useLessonsData = async (): Promise<
     }[]
   | undefined
 > => {
-  const role = await getUserRole();
-  const userId = await getUserId();
+  const dataRes = await prisma.lesson.findMany({
+    where: {
+      ...(type === "teacherId"
+        ? { teacherId: id as string }
+        : { classId: id as number }),
+    },
+  });
 
-  let dataRes;
-
-  if (role === "teacher") {
-    dataRes = await prisma.lesson.findMany({
-      where: { teacherId: userId as string },
-    });
-  } else if (role === "student") {
-    const classItem = await prisma.class.findFirst({
-      where: { students: { some: { id: userId! } } },
-    });
-
-    dataRes = await prisma.lesson.findMany({
-      where: { classId: classItem!.id },
-    });
-  }
-
-  const lessonsData = dataRes?.map((lesson) => ({
+  const data = dataRes.map((lesson) => ({
     title: lesson.name,
-    allDay: false,
     start: lesson.startTime,
     end: lesson.endTime,
+    allDay: false,
   }));
 
-  let lessons;
+  const schedule = adjuctScheduleToCurrentWeek(data);
 
-  if (lessonsData) {
-    lessons = adjuctScheduleToCurrentWeek(lessonsData);
-  }
-
-  return lessons;
+  return schedule;
 };
 
 export default useLessonsData;

@@ -1,9 +1,20 @@
 import useLessonsData from "@/hooks/useLessonsData";
-import BigCalnedar from "./BigCalendar";
+import BigCalendar from "./BigCalendar";
 
-async function BigCalendarContainer() {
-  const lessons = await useLessonsData();
+const BigCalendarContainer = async ({
+  type,
+  id,
+}: {
+  type: "teacherId" | "classId";
+  id: string | number;
+}) => {
+  const schedule = await useLessonsData(type, id);
 
-  return <BigCalnedar data={lessons} />;
-}
+  return (
+    <div className="">
+      <BigCalendar data={schedule} />
+    </div>
+  );
+};
+
 export default BigCalendarContainer;

@@ -3,11 +3,11 @@ import Link from "next/link";
 
 import UserSingleTeacherPage from "@/hooks/userSingleTeacherPage";
 
-import BigCalnedar from "@/components/BigCalendar";
 import Announcements from "@/components/Announcements";
 import PreformanceChart from "@/components/PreformanceChart";
 import FormModalContainer from "@/components/FormModalContainer";
 import { formatDate } from "@/lib/utils";
+import BigCalendarContainer from "@/components/BigCalendarContainer";
 
 async function SingleTeacherPage({
   params: { id },
@@ -144,7 +144,7 @@ async function SingleTeacherPage({
         {/* BOTTOM */}
         <div className="mt-4 bg-white rounded-md p-4 h-[800px]">
           <h1>Teacher's Schedule</h1>
-          <BigCalnedar />
+          <BigCalendarContainer type="teacherId" id={id} />
         </div>
       </div>
       {/* RIGHT  */}
