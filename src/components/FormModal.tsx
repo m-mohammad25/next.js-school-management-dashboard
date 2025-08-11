@@ -3,7 +3,12 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
-import { deleteClass, deleteSubject, deleteTeacher } from "./actions";
+import {
+  deleteClass,
+  deleteStudent,
+  deleteSubject,
+  deleteTeacher,
+} from "./actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { formModalContainerProps } from "./FormModalContainer";
@@ -12,7 +17,7 @@ const deleteActionMap = {
   subject: deleteSubject,
   class: deleteClass,
   teacher: deleteTeacher,
-  student: deleteSubject,
+  student: deleteStudent,
   exam: deleteSubject,
   // TODO: OTHER DELETE ACTIONS
   parent: deleteSubject,
@@ -71,14 +76,14 @@ const forms: {
       relatedData={relatedData}
     />
   ),
-  // student: (setOpenModal, type, data, relatedData) => (
-  //   <StudentForm
-  //     type={type}
-  //     data={data}
-  //     setOpenModal={setOpenModal}
-  //     relatedData={relatedData}
-  //   />
-  // ),
+  student: (setOpenModal, type, data, relatedData) => (
+    <StudentForm
+      type={type}
+      data={data}
+      setOpenModal={setOpenModal}
+      relatedData={relatedData}
+    />
+  ),
 };
 
 function FormModal({

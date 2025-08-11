@@ -1,14 +1,14 @@
-import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Pagination";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
+import Image from "next/image";
+import Link from "next/link";
 
 import { Class, Prisma, Student } from "@prisma/client";
 import prisma from "@/lib/prisma";
 
-import { role } from "@/lib/data";
-import Image from "next/image";
-import Link from "next/link";
+import FormModalContainer from "@/components/FormModalContainer";
+import Pagination from "@/components/Pagination";
+import Table from "@/components/Table";
+import TableSearch from "@/components/TableSearch";
+
 import { ITEMS_PER_PAGE } from "@/lib/settings";
 import { getUserRole } from "@/lib/utils";
 
@@ -87,7 +87,7 @@ async function StudentsListsPage({
         </Link>
 
         {role == "admin" && (
-          <FormModal table="student" type="delete" id={student.id} />
+          <FormModalContainer table="student" type="delete" id={student.id} />
         )}
       </td>
     </tr>
@@ -149,7 +149,9 @@ async function StudentsListsPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {role === "admin" && <FormModal table="student" type="create" />}
+            {role === "admin" && (
+              <FormModalContainer table="student" type="create" />
+            )}
           </div>
         </div>
       </div>

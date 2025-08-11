@@ -70,6 +70,29 @@ async function FormModalContainer({
         relatedData = { teacherSubjects: teacherSubjects };
         break;
 
+      case "student":
+        const studentsClasses = await prisma.class.findMany({
+          include: {
+            _count: { select: { students: true } },
+          },
+        });
+
+        const studentsGrades = await prisma.grade.findMany({
+          select: {
+            id: true,
+            level: true,
+          },
+        });
+
+        const studentsParents = await prisma.parent.findMany({
+          select: {
+            id: true,
+          },
+        });
+
+        relatedData = { studentsClasses, studentsGrades, studentsParents };
+        break;
+
       default:
         break;
     }

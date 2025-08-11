@@ -1,5 +1,6 @@
 import Announcements from "@/components/Announcements";
 import BigCalendarContainer from "@/components/BigCalendarContainer";
+import FormModalContainer from "@/components/FormModalContainer";
 import PreformanceChart from "@/components/PreformanceChart";
 import StudentAttendenceCard from "@/components/StudentAttendenceCard";
 import UserSingleStudentPage from "@/hooks/userSingleStudentPage";
@@ -32,7 +33,16 @@ const SingleStudentPage = async ({
               />
             </div>
             <div className="w-2/3 flex flex-col justify-between gap-4">
-              <h1 className="text-xl font-semibold">{`${studentData.name} ${studentData.surname}`}</h1>
+              <div className="flex items-center gap-4">
+                <h1 className="text-xl font-semibold">{`${studentData.name} ${studentData.surname}`}</h1>
+                {role === "admin" && (
+                  <FormModalContainer
+                    type="update"
+                    table="student"
+                    data={studentData}
+                  />
+                )}
+              </div>
               <p className="text-sm text-gray-500">
                 Lorem ipsum, dolor sit amet consectetur adipisicing elit.
               </p>

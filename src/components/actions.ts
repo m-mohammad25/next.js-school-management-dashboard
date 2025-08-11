@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import {
   ClassFormInputsTypes,
+  StudentFormInputsTypes,
   SubjectFormInputsTypes,
   TeacherFormInputsTypes,
 } from "./formsValidationSchemas";
@@ -213,7 +214,124 @@ export const deleteTeacher = async (
   if (!id) return { success: false, error: true };
 
   try {
+    const clerk = await clerkClient();
+    await clerk.users.deleteUser(id);
+
     await prisma.teacher.delete({
+      where: { id: id },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    return { success: false, error: true };
+  }
+};
+// Student Actions
+
+export const createStudent = async (
+  currentState: CreateSubjectActionState,
+  data: StudentFormInputsTypes
+) => {
+  try {
+    const classItem = await prisma.class.findUnique({
+      where: { id: data.classId },
+      include: { _count: { select: { students: true } } },
+    });
+
+    if (classItem && classItem.capacity === classItem._count.students) {
+      // class is full
+      return { success: false, error: false };
+    }
+    const clerk = await clerkClient();
+    const user = await clerk.users.createUser({
+      username: data.username,
+      password: data.password,
+      firstName: data.name,
+      lastName: data.surname,
+      publicMetadata: { role: "student" },
+    });
+
+    await prisma.student.create({
+      data: {
+        id: user.id,
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        img: data.img,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        birthday: data.birthday,
+        classId: data.classId,
+        parentId: data.parentId,
+        gradeId: data.gradeId,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateStudent = async (
+  currentState: CreateSubjectActionState,
+  data: StudentFormInputsTypes
+) => {
+  try {
+    if (!data.id) return { success: false, error: true };
+
+    const clerk = await clerkClient();
+    const user = await clerk.users.updateUser(data.id, {
+      ...(data.password !== "" && { password: data.password }),
+      username: data.username,
+      firstName: data.name,
+      lastName: data.surname,
+      publicMetadata: { role: "student" },
+    });
+
+    await prisma.student.update({
+      where: { id: data.id },
+      data: {
+        id: user.id,
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        img: data.img,
+        bloodType: data.bloodType,
+        sex: data.sex,
+        birthday: data.birthday,
+        classId: data.classId,
+        parentId: data.parentId,
+        gradeId: data.gradeId,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteStudent = async (
+  currentState: CreateSubjectActionState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true };
+
+  try {
+    const clerk = await clerkClient();
+    await clerk.users.deleteUser(id);
+
+    await prisma.student.delete({
       where: { id: id },
     });
 

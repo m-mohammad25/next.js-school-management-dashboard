@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { createTeacher, updateTeacher } from "../actions";
 import Image from "next/image";
-import { formatDate } from "@/lib/utils";
 
 type TeacherFormProps = {
   setOpenModal: Dispatch<SetStateAction<boolean>>;

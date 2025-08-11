@@ -9,7 +9,6 @@ const BigCalendarContainer = async ({
   id: string | number;
 }) => {
   const schedule = await useLessonsData(type, id);
-  console.log(schedule);
 
   return (
     <div className="">

@@ -47,3 +47,34 @@ export const teacherSchema = z.object({
 });
 
 export type TeacherFormInputsTypes = z.infer<typeof teacherSchema>;
+
+export const studentSchema = z.object({
+  id: z.string().optional(),
+  username: z
+    .string()
+    .min(3, { message: "Username must be at least 3 characters long!" })
+    .max(20, { message: "Username can be 20 characters at most" }),
+  password: z
+    .string()
+    .min(8, { message: "password must be at least 8 characters" })
+    .optional()
+    .or(z.literal("")),
+  email: z
+    .string()
+    .email({ message: "Invalid email address" })
+    .optional()
+    .or(z.literal("")),
+  name: z.string().min(1, { message: "name is required" }),
+  surname: z.string().min(1, { message: "surname is required" }),
+  phone: z.string().optional(),
+  address: z.string().min(1, { message: "Address is required" }),
+  bloodType: z.string().min(1, { message: "Blood type is required" }),
+  birthday: z.coerce.date({ message: "Birthday is required" }),
+  sex: z.enum(["MALE", "FEMALE"], { message: "Sex is required" }),
+  img: z.string().optional(),
+  classId: z.coerce.number(),
+  gradeId: z.coerce.number(),
+  parentId: z.string(),
+});
+
+export type StudentFormInputsTypes = z.infer<typeof studentSchema>;
