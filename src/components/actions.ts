@@ -6,8 +6,10 @@ import {
   StudentFormInputsTypes,
   SubjectFormInputsTypes,
   TeacherFormInputsTypes,
+  ExamFormInputsTypes,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
+import { getUserId, getUserRole } from "@/lib/utils";
 
 type CreateSubjectActionState = { success: boolean; error: boolean };
 
@@ -337,6 +339,112 @@ export const deleteStudent = async (
 
     return { success: true, error: false };
   } catch (error) {
+    return { success: false, error: true };
+  }
+};
+
+export const createExam = async (
+  currentState: CreateSubjectActionState,
+  data: ExamFormInputsTypes
+) => {
+  const role = await getUserRole();
+  const userId = await getUserId();
+
+  try {
+    if (role === "teacher") {
+      const teacherLesson = await prisma.lesson.findFirst({
+        where: {
+          teacherId: userId!,
+          id: data.lessonId,
+        },
+      });
+
+      if (!teacherLesson) {
+        return { success: false, error: true };
+      }
+    }
+
+    await prisma.exam.create({
+      data: {
+        title: data.title,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        lessonId: data.lessonId,
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+// exam actions
+
+export const updateExam = async (
+  currentState: CreateSubjectActionState,
+  data: ExamFormInputsTypes
+) => {
+  const role = await getUserRole();
+  const userId = await getUserId();
+
+  try {
+    if (role === "teacher") {
+      const teacherLesson = await prisma.lesson.findFirst({
+        where: {
+          teacherId: userId!,
+          id: data.lessonId,
+        },
+      });
+
+      if (!teacherLesson) {
+        return { success: false, error: true };
+      }
+    }
+
+    await prisma.exam.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        title: data.title,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        lessonId: data.lessonId,
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteExam = async (
+  currentState: CreateSubjectActionState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+
+  const role = await getUserRole();
+  const userId = await getUserId();
+
+  try {
+    await prisma.exam.delete({
+      where: {
+        id: parseInt(id),
+        ...(role === "teacher" ? { lesson: { teacherId: userId! } } : {}),
+      },
+    });
+
+    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
     return { success: false, error: true };
   }
 };
