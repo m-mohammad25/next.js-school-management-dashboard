@@ -49,7 +49,7 @@ function SubjectForm({
       setOpenModal(false);
       router.refresh();
     }
-  }, [state]);
+  }, [state, toast, setOpenModal, router]);
 
   const onSubmit = handleSubmit((data) => {
     formAction(data);

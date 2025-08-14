@@ -53,7 +53,7 @@ function StudentForm({
       setOpenModal(false);
       router.refresh();
     }
-  }, [state]);
+  }, [state, toast, setOpenModal, router]);
 
   const onSubmit = handleSubmit((data) => {
     formAction({ ...data, img: imgUrl });
@@ -96,7 +96,13 @@ function StudentForm({
         <CldUploadWidget
           uploadPreset="school"
           onSuccess={(result, { widget }) => {
-            setImgUrl(result.info?.secure_url);
+            if (
+              result &&
+              typeof result.info === "object" &&
+              "secure_url" in result.info
+            ) {
+              setImgUrl(result.info?.secure_url);
+            }
             widget.close();
           }}
         >

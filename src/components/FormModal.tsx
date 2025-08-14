@@ -121,7 +121,7 @@ function FormModal({
         setOpenModal(false);
         router.refresh();
       }
-    }, [state]);
+    }, [state, toast, setOpenModal, router]);
     return type === "delete" && id ? (
       <form
         action={deleteAction}

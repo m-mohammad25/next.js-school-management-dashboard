@@ -53,7 +53,7 @@ function TeacherForm({
       setOpenModal(false);
       router.refresh();
     }
-  }, [state]);
+  }, [state, setOpenModal, router, toast]);
 
   const onSubmit = handleSubmit((data) => {
     formAction({ ...data, img: imgUrl });
