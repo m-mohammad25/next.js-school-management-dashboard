@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { literal } from "zod/v4-mini";
 
 export const subjectSchema = z.object({
   id: z.coerce.number().optional(),
@@ -48,24 +47,20 @@ export const teacherSchema = z.object({
 
 export type TeacherFormInputsTypes = z.infer<typeof teacherSchema>;
 
-export const studentSchema = z.object({
+// Base schema shared by both
+const baseStudentSchema = z.object({
   id: z.string().optional(),
   username: z
     .string()
     .min(3, { message: "Username must be at least 3 characters long!" })
     .max(20, { message: "Username can be 20 characters at most" }),
-  password: z
-    .string()
-    .min(8, { message: "password must be at least 8 characters" })
-    .optional()
-    .or(z.literal("")),
   email: z
     .string()
     .email({ message: "Invalid email address" })
     .optional()
     .or(z.literal("")),
-  name: z.string().min(1, { message: "name is required" }),
-  surname: z.string().min(1, { message: "surname is required" }),
+  name: z.string().min(1, { message: "Name is required" }),
+  surname: z.string().min(1, { message: "Surname is required" }),
   phone: z.string().optional(),
   address: z.string().min(1, { message: "Address is required" }),
   bloodType: z.string().min(1, { message: "Blood type is required" }),
@@ -77,7 +72,20 @@ export const studentSchema = z.object({
   parentId: z.string(),
 });
 
-export type StudentFormInputsTypes = z.infer<typeof studentSchema>;
+// Create schema → password required
+export const createStudentSchema = baseStudentSchema.extend({
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters" }),
+});
+
+// Update schema → password optional
+export const updateStudentSchema = baseStudentSchema.extend({
+  password: z.string().min(8).optional().or(z.literal("")),
+});
+
+export type CreateStudentInputs = z.infer<typeof createStudentSchema>;
+export type UpdateStudentInputs = z.infer<typeof updateStudentSchema>;
 
 export const examSchema = z.object({
   id: z.coerce.number().optional(),

@@ -8,8 +8,10 @@ import { CldUploadWidget } from "next-cloudinary";
 import InputField from "@/components/InputField";
 
 import {
-  StudentFormInputsTypes,
-  studentSchema,
+  CreateStudentInputs,
+  createStudentSchema,
+  UpdateStudentInputs,
+  updateStudentSchema,
 } from "../formsValidationSchemas";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,25 +21,21 @@ import Image from "next/image";
 
 type StudentFormProps = {
   setOpenModal: Dispatch<SetStateAction<boolean>>;
-  type: "update" | "create";
+  type: "create" | "update";
   data?: any;
   relatedData?: any;
 };
+
 function StudentForm({
   type,
   data,
   relatedData,
   setOpenModal,
 }: StudentFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<StudentFormInputsTypes>({
-    resolver: zodResolver(studentSchema),
-  });
+  const [imgUrl, setImgUrl] = useState<string>(data?.img || "/noAvatar.png");
 
-  const [imgUrl, setImgUrl] = useState<any>();
+  const router = useRouter();
+
   const [state, formAction] = useFormState(
     type === "create" ? createStudent : updateStudent,
     {
@@ -45,8 +43,6 @@ function StudentForm({
       error: false,
     }
   );
-
-  const router = useRouter();
   useEffect(() => {
     if (state.success) {
       toast(`Student has been ${type}d sucessfully!`);
@@ -55,13 +51,31 @@ function StudentForm({
     }
   }, [state, toast, setOpenModal, router]);
 
+  const form =
+    type === "create"
+      ? useForm<CreateStudentInputs>({
+          resolver: zodResolver(createStudentSchema),
+        })
+      : useForm<UpdateStudentInputs>({
+          resolver: zodResolver(updateStudentSchema),
+        });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
   const onSubmit = handleSubmit((data) => {
-    formAction({ ...data, img: imgUrl });
+    const payload = { ...data, img: imgUrl };
+    formAction(payload as any);
   });
 
-  return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-8">
-      <h1 className="text-xl font-semibold ">Create a new teacher</h1>
+  const formBody = (
+    <>
+      <h1 className="text-xl font-semibold ">
+        {type === "create" ? "Create a new student" : "Update student"}
+      </h1>
       <span className="text-xs to-gray-400 font-medium">
         Authentication Information
       </span>
@@ -108,13 +122,30 @@ function StudentForm({
         >
           {({ open }) => {
             return (
-              <label
-                className="text-xs text-gray-500 gap-2 cursor-pointer flex items-center justify-between"
-                onClick={() => open()}
-              >
-                <Image src="/upload.png" alt="upload" width={28} height={28} />
-                <span>upload an image</span>
-              </label>
+              <div className="flex items-center gap-4">
+                <label
+                  className="text-xs text-gray-500 gap-2 cursor-pointer flex items-center justify-between"
+                  onClick={() => open()}
+                >
+                  <Image
+                    src="/upload.png"
+                    alt="upload"
+                    width={28}
+                    height={28}
+                  />
+                  <span>upload an image</span>
+                </label>
+                {/* Preview the uploaded image */}
+                {imgUrl && (
+                  <Image
+                    src={imgUrl}
+                    alt="Uploaded preview"
+                    width={50}
+                    height={50}
+                    className="rounded-md border"
+                  />
+                )}
+              </div>
             );
           }}
         </CldUploadWidget>
@@ -256,6 +287,12 @@ function StudentForm({
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "create" : "update"}
       </button>
+    </>
+  );
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-8">
+      {formBody}
     </form>
   );
 }

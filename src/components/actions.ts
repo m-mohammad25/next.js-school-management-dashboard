@@ -3,10 +3,11 @@
 import prisma from "@/lib/prisma";
 import {
   ClassFormInputsTypes,
-  StudentFormInputsTypes,
   SubjectFormInputsTypes,
   TeacherFormInputsTypes,
   ExamFormInputsTypes,
+  UpdateStudentInputs,
+  CreateStudentInputs,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole } from "@/lib/utils";
@@ -232,7 +233,7 @@ export const deleteTeacher = async (
 
 export const createStudent = async (
   currentState: CreateSubjectActionState,
-  data: StudentFormInputsTypes
+  data: CreateStudentInputs
 ) => {
   try {
     const classItem = await prisma.class.findUnique({
@@ -281,7 +282,7 @@ export const createStudent = async (
 
 export const updateStudent = async (
   currentState: CreateSubjectActionState,
-  data: StudentFormInputsTypes
+  data: UpdateStudentInputs
 ) => {
   try {
     if (!data.id) return { success: false, error: true };
