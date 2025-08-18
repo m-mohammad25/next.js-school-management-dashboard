@@ -1,43 +1,44 @@
 "use client";
 
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
+
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CldUploadWidget } from "next-cloudinary";
 
 import InputField from "@/components/InputField";
 
 import {
-  TeacherFormInputsTypes,
-  teacherSchema,
+  CreateTeacherInputs,
+  createTeacherSchema,
+  UpdateTeacherInputs,
+  updateTeacherSchema,
 } from "../formsValidationSchemas";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+
 import { toast } from "react-toastify";
 import { createTeacher, updateTeacher } from "../actions";
-import Image from "next/image";
 
 type TeacherFormProps = {
   setOpenModal: Dispatch<SetStateAction<boolean>>;
-  type: "update" | "create";
+  type: "create" | "update";
   data?: any;
   relatedData?: any;
 };
+
 function TeacherForm({
   type,
   data,
   relatedData,
   setOpenModal,
 }: TeacherFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<TeacherFormInputsTypes>({
-    resolver: zodResolver(teacherSchema),
-  });
+  const [imgUrl, setImgUrl] = useState<string>(data?.img || "/noAvatar.png");
 
-  const [imgUrl, setImgUrl] = useState<any>();
+  const router = useRouter();
+
   const [state, formAction] = useFormState(
     type === "create" ? createTeacher : updateTeacher,
     {
@@ -46,22 +47,39 @@ function TeacherForm({
     }
   );
 
-  const router = useRouter();
   useEffect(() => {
     if (state.success) {
       toast(`Teacher has been ${type}d sucessfully!`);
       setOpenModal(false);
       router.refresh();
     }
-  }, [state, setOpenModal, router, toast]);
+  }, [state, toast, setOpenModal, router]);
 
-  const onSubmit = handleSubmit((data) => {
-    formAction({ ...data, img: imgUrl });
+  const form =
+    type === "create"
+      ? useForm<CreateTeacherInputs>({
+          resolver: zodResolver(createTeacherSchema),
+        })
+      : useForm<UpdateTeacherInputs>({
+          resolver: zodResolver(updateTeacherSchema),
+        });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const onSubmit = handleSubmit((formData) => {
+    const payload = { ...formData, img: imgUrl };
+    formAction(payload as any);
   });
 
-  return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-8">
-      <h1 className="text-xl font-semibold ">Create a new teacher</h1>
+  const formBody = (
+    <>
+      <h1 className="text-xl font-semibold ">
+        {type === "create" ? "Create a new teacher" : "Update teacher"}
+      </h1>
       <span className="text-xs to-gray-400 font-medium">
         Authentication Information
       </span>
@@ -93,6 +111,48 @@ function TeacherForm({
         Personal Information
       </span>
       <div className="flex justify-between flex-wrap gap-4">
+        <CldUploadWidget
+          uploadPreset="school"
+          onSuccess={(result, { widget }) => {
+            if (
+              result &&
+              typeof result.info === "object" &&
+              "secure_url" in result.info
+            ) {
+              setImgUrl(result.info?.secure_url);
+            }
+            widget.close();
+          }}
+        >
+          {({ open }) => {
+            return (
+              <div className="flex items-center gap-4">
+                <label
+                  className="text-xs text-gray-500 gap-2 cursor-pointer flex items-center justify-between"
+                  onClick={() => open()}
+                >
+                  <Image
+                    src="/upload.png"
+                    alt="upload"
+                    width={28}
+                    height={28}
+                  />
+                  <span>upload an image</span>
+                </label>
+                {imgUrl && (
+                  <Image
+                    src={imgUrl}
+                    alt="Uploaded preview"
+                    width={50}
+                    height={50}
+                    className="rounded-md border"
+                  />
+                )}
+              </div>
+            );
+          }}
+        </CldUploadWidget>
+
         <InputField
           label="Name"
           name="name"
@@ -131,7 +191,7 @@ function TeacherForm({
         <InputField
           label="Birthday"
           name="birthday"
-          defaultValue={data?.birthday.toISOString().split("T")[0]}
+          defaultValue={data?.birthday?.toISOString().split("T")[0]}
           register={register}
           error={errors?.birthday}
           type="date"
@@ -156,9 +216,7 @@ function TeacherForm({
             {...register("sex")}
             defaultValue={data?.sex}
           >
-            <option selected value="MALE">
-              Male
-            </option>
+            <option value="MALE">Male</option>
             <option value="FEMALE">Female</option>
           </select>
           {errors.sex?.message && (
@@ -168,7 +226,7 @@ function TeacherForm({
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label htmlFor="subjects" className="text-xs text-gray-500 gap-0">
-            subjects
+            Subjects
           </label>
           <select
             multiple
@@ -188,26 +246,6 @@ function TeacherForm({
             <p className="text-xs text-red-400">{errors.subjects?.message}</p>
           )}
         </div>
-
-        <CldUploadWidget
-          uploadPreset="school"
-          onSuccess={(result, { widget }) => {
-            setImgUrl(result.info?.secure_url);
-            widget.close();
-          }}
-        >
-          {({ open }) => {
-            return (
-              <label
-                className="text-xs text-gray-500 gap-2 cursor-pointer flex items-center justify-between"
-                onClick={() => open()}
-              >
-                <Image src="/upload.png" alt="upload" width={28} height={28} />
-                <span>upload an image</span>
-              </label>
-            );
-          }}
-        </CldUploadWidget>
       </div>
       {state.error && (
         <span className="text-red-500">something went wrong!</span>
@@ -215,6 +253,12 @@ function TeacherForm({
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "create" : "update"}
       </button>
+    </>
+  );
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-8">
+      {formBody}
     </form>
   );
 }

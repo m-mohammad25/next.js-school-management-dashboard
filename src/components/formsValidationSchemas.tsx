@@ -18,17 +18,12 @@ export const classSchema = z.object({
 
 export type ClassFormInputsTypes = z.infer<typeof classSchema>;
 
-export const teacherSchema = z.object({
+export const baseTeacherSchema = z.object({
   id: z.string().optional(),
   username: z
     .string()
     .min(3, { message: "Username must be at least 3 characters long!" })
     .max(20, { message: "Username can be 20 characters at most" }),
-  password: z
-    .string()
-    .min(8, { message: "password must be at least 8 characters" })
-    .optional()
-    .or(z.literal("")),
   email: z
     .string()
     .email({ message: "Invalid email address" })
@@ -45,7 +40,18 @@ export const teacherSchema = z.object({
   subjects: z.array(z.string()).optional(), // subject ids
 });
 
-export type TeacherFormInputsTypes = z.infer<typeof teacherSchema>;
+export const createTeacherSchema = baseTeacherSchema.extend({
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters" }),
+});
+
+export const updateTeacherSchema = baseTeacherSchema.extend({
+  password: z.string().min(8).optional().or(z.literal("")),
+});
+
+export type CreateTeacherInputs = z.infer<typeof createTeacherSchema>;
+export type UpdateTeacherInputs = z.infer<typeof updateTeacherSchema>;
 
 // Base schema shared by both
 const baseStudentSchema = z.object({

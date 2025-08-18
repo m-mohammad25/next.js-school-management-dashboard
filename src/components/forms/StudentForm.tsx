@@ -1,7 +1,12 @@
 "use client";
 
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
+
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CldUploadWidget } from "next-cloudinary";
 
@@ -13,11 +18,9 @@ import {
   UpdateStudentInputs,
   updateStudentSchema,
 } from "../formsValidationSchemas";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+
 import { toast } from "react-toastify";
 import { createStudent, updateStudent } from "../actions";
-import Image from "next/image";
 
 type StudentFormProps = {
   setOpenModal: Dispatch<SetStateAction<boolean>>;
