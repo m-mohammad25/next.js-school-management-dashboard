@@ -1,6 +1,8 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+
 import {
   ClassFormInputsTypes,
   SubjectFormInputsTypes,
@@ -16,8 +18,18 @@ import {
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole } from "@/lib/utils";
+import { ZodError } from "zod";
+import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 
 type CreateSubjectActionState = { success: boolean; error: boolean };
+export type ActionState = {
+  success: boolean;
+  error: boolean;
+  message?: string;
+  fieldErrors?: Record<string, string[] | undefined>;
+};
+
+// Exception handler
 
 // Subject Actions
 
@@ -132,7 +144,7 @@ export const deleteClass = async (
 // Teacher Actions
 
 export const createTeacher = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: CreateTeacherInputs
 ) => {
   try {
@@ -169,13 +181,52 @@ export const createTeacher = async (
 
     return { success: true, error: false };
   } catch (error) {
+    if (error instanceof ZodError) {
+      return {
+        success: false,
+        error: true,
+        fieldErrors: error.flatten().fieldErrors,
+      };
+    }
+
+    if (isClerkAPIResponseError(error)) {
+      const messages =
+        error.errors?.map((err) => err.longMessage || err.message) || [];
+
+      return {
+        success: false,
+        error: true,
+        fieldErrors: {
+          clerk: messages,
+        },
+      };
+    }
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        // Unique constraint failed
+        const field = (error?.meta?.target as string[])?.[0];
+        return {
+          success: false,
+          error: true,
+          fieldErrors: {
+            [field]: [`${field} is already taken`],
+          },
+        };
+      }
+    }
+
     console.error("❌ createTeacher error:", error);
-    return { success: false, error: true };
+    return {
+      success: false,
+      error: true,
+      message: "Unexpected error occurred",
+    };
   }
 };
 
 export const updateTeacher = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: UpdateTeacherInputs
 ) => {
   try {
@@ -213,8 +264,33 @@ export const updateTeacher = async (
 
     return { success: true, error: false };
   } catch (error) {
-    console.error("❌ updateTeacher error:", error);
-    return { success: false, error: true };
+    if (error instanceof ZodError) {
+      return {
+        success: false,
+        error: true,
+        fieldErrors: error.flatten().fieldErrors,
+      };
+    }
+
+    if (isClerkAPIResponseError(error)) {
+      const messages =
+        error.errors?.map((err) => err.longMessage || err.message) || [];
+
+      return {
+        success: false,
+        error: true,
+        fieldErrors: {
+          clerk: messages,
+        },
+      };
+    }
+
+    console.error("❌ createTeacher error:", error);
+    return {
+      success: false,
+      error: true,
+      message: "Unexpected error occurred",
+    };
   }
 };
 

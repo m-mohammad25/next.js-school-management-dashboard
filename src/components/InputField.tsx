@@ -6,7 +6,7 @@ type InputFieldProps = {
   register: any;
   name: string;
   defaultValue?: string;
-  error?: FieldError;
+  error?: FieldError | string;
   hidden?: boolean;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 };
@@ -21,6 +21,7 @@ function InputField({
   inputProps,
   hidden,
 }: InputFieldProps) {
+  const errorMessage = typeof error === "string" ? error : error?.message;
   return (
     <div
       className={`flex flex-col gap-2 w-full md:w-1/4 ${
@@ -38,9 +39,7 @@ function InputField({
         defaultValue={defaultValue}
         {...inputProps}
       />
-      {error?.message && (
-        <p className="text-xs text-red-400">{error.message}</p>
-      )}
+      {errorMessage && <p className="text-xs text-red-400">{errorMessage}</p>}
     </div>
   );
 }

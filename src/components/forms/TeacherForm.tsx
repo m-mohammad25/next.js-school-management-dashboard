@@ -89,14 +89,14 @@ function TeacherForm({
           name="username"
           defaultValue={data?.username}
           register={register}
-          error={errors?.username}
+          error={errors?.username || state?.fieldErrors?.username?.[0]}
         />
         <InputField
           label="Email"
           name="email"
           defaultValue={data?.email}
           register={register}
-          error={errors?.email}
+          error={errors?.email || state?.fieldErrors?.email?.[0]}
         />
         <InputField
           label="Password"
@@ -104,7 +104,7 @@ function TeacherForm({
           type="password"
           defaultValue={data?.password}
           register={register}
-          error={errors?.password}
+          error={errors?.password || state?.fieldErrors?.password?.[0]}
         />
       </div>
       <span className="text-sm text-gray-400 font-medium">
@@ -158,42 +158,42 @@ function TeacherForm({
           name="name"
           defaultValue={data?.name}
           register={register}
-          error={errors?.name}
+          error={errors?.name || state?.fieldErrors?.name?.[0]}
         />
         <InputField
           label="Surname"
           name="surname"
           defaultValue={data?.surname}
           register={register}
-          error={errors?.surname}
+          error={errors?.surname || state?.fieldErrors?.surname?.[0]}
         />
         <InputField
           label="Phone"
           name="phone"
           defaultValue={data?.phone}
           register={register}
-          error={errors?.phone}
+          error={errors?.phone || state?.fieldErrors?.phone?.[0]}
         />
         <InputField
           label="Address"
           name="address"
           defaultValue={data?.address}
           register={register}
-          error={errors?.address}
+          error={errors?.address || state?.fieldErrors?.address?.[0]}
         />
         <InputField
           label="Blood Type"
           name="bloodType"
           defaultValue={data?.bloodType}
           register={register}
-          error={errors?.bloodType}
+          error={errors?.bloodType || state?.fieldErrors?.bloodType?.[0]}
         />
         <InputField
           label="Birthday"
           name="birthday"
           defaultValue={data?.birthday?.toISOString().split("T")[0]}
           register={register}
-          error={errors?.birthday}
+          error={errors?.birthday || state?.fieldErrors?.birthday?.[0]}
           type="date"
         />
         {data && (
@@ -202,7 +202,7 @@ function TeacherForm({
             name="id"
             defaultValue={data?.id}
             register={register}
-            error={errors?.id}
+            error={errors?.id || state?.fieldErrors?.id?.[0]}
             hidden
           />
         )}
@@ -221,6 +221,11 @@ function TeacherForm({
           </select>
           {errors.sex?.message && (
             <p className="text-xs text-red-400">{errors.sex?.message}</p>
+          )}
+          {state?.fieldErrors?.sex?.[0] && (
+            <p className="text-xs text-red-400">
+              {state?.fieldErrors?.sex?.[0]}
+            </p>
           )}
         </div>
 
@@ -245,10 +250,14 @@ function TeacherForm({
           {errors.subjects?.message && (
             <p className="text-xs text-red-400">{errors.subjects?.message}</p>
           )}
+          {state?.fieldErrors?.subjects?.[0] && (
+            <p className="text-xs text-red-400">{errors.subjects?.message}</p>
+          )}
         </div>
       </div>
-      {state.error && (
-        <span className="text-red-500">something went wrong!</span>
+      {state?.message && <span className="text-red-500">{state.message}</span>}
+      {state?.fieldErrors?.clerk && (
+        <span className="text-red-500">{state?.fieldErrors?.clerk?.[0]}</span>
       )}
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "create" : "update"}
