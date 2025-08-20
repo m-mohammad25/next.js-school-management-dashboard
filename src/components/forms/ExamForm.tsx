@@ -12,18 +12,9 @@ import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { FormProps } from "./types";
 
-const ExamForm = ({
-  type,
-  data,
-  setOpenModal,
-  relatedData,
-}: {
-  type: "create" | "update";
-  data?: any;
-  setOpenModal: Dispatch<SetStateAction<boolean>>;
-  relatedData?: any;
-}) => {
+const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
   const {
     register,
     handleSubmit,

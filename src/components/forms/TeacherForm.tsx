@@ -20,21 +20,12 @@ import {
 } from "../formsValidationSchemas";
 
 import { toast } from "react-toastify";
+
 import { createTeacher, updateTeacher } from "../actions";
 
-type TeacherFormProps = {
-  setOpenModal: Dispatch<SetStateAction<boolean>>;
-  type: "create" | "update";
-  data?: any;
-  relatedData?: any;
-};
+import { FormProps } from "./types";
 
-function TeacherForm({
-  type,
-  data,
-  relatedData,
-  setOpenModal,
-}: TeacherFormProps) {
+function TeacherForm({ type, data, relatedData, setOpenModal }: FormProps) {
   const [imgUrl, setImgUrl] = useState<string>(data?.img || "/noAvatar.png");
 
   const router = useRouter();

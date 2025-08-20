@@ -21,20 +21,9 @@ import {
 
 import { toast } from "react-toastify";
 import { createStudent, updateStudent } from "../actions";
+import { FormProps } from "./types";
 
-type StudentFormProps = {
-  setOpenModal: Dispatch<SetStateAction<boolean>>;
-  type: "create" | "update";
-  data?: any;
-  relatedData?: any;
-};
-
-function StudentForm({
-  type,
-  data,
-  relatedData,
-  setOpenModal,
-}: StudentFormProps) {
+function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
   const [imgUrl, setImgUrl] = useState<string>(data?.img || "/noAvatar.png");
 
   const router = useRouter();

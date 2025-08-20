@@ -15,6 +15,7 @@ import {
   updateTeacherSchema,
   createStudentSchema,
   updateStudentSchema,
+  subjectSchema,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole } from "@/lib/utils";
@@ -31,18 +32,63 @@ export type ActionState = {
 
 // Exception handler
 
+const exceptionHandler = (error: unknown): ActionState => {
+  if (error instanceof ZodError) {
+    return {
+      success: false,
+      error: true,
+      fieldErrors: error.flatten().fieldErrors,
+    };
+  }
+
+  if (isClerkAPIResponseError(error)) {
+    const messages =
+      error.errors?.map((err) => err.longMessage || err.message) || [];
+
+    return {
+      success: false,
+      error: true,
+      fieldErrors: {
+        clerk: messages,
+      },
+    };
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === "P2002") {
+      // Unique constraint failed
+      const field = (error?.meta?.target as string[])?.[0];
+      return {
+        success: false,
+        error: true,
+        fieldErrors: {
+          [field]: [`${field} is already taken`],
+        },
+      };
+    }
+  }
+
+  console.error("❌ createTeacher error:", error);
+  return {
+    success: false,
+    error: true,
+    message: "Unexpected error occurred",
+  };
+};
 // Subject Actions
 
 export const createSubject = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: SubjectFormInputsTypes
 ) => {
+  const parsed = subjectSchema.parse(data);
+
   try {
     await prisma.subject.create({
       data: {
-        name: data.name,
+        name: parsed.name,
         teachers: {
-          connect: data.teachers.map((teacherId) => ({
+          connect: parsed.teachers.map((teacherId) => ({
             id: teacherId,
           })),
         },
@@ -51,21 +97,23 @@ export const createSubject = async (
 
     return { success: true, error: false };
   } catch (error) {
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
 
 export const updateSubject = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: SubjectFormInputsTypes
 ) => {
+  const parsed = subjectSchema.parse(data);
+
   try {
     await prisma.subject.update({
-      where: { id: data.id },
+      where: { id: parsed.id },
       data: {
-        name: data.name,
+        name: parsed.name,
         teachers: {
-          set: data.teachers.map((teacherId) => ({
+          set: parsed.teachers.map((teacherId) => ({
             id: teacherId,
           })),
         },
@@ -74,7 +122,7 @@ export const updateSubject = async (
 
     return { success: true, error: false };
   } catch (error) {
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
 
@@ -82,14 +130,17 @@ export const deleteSubject = async (
   currentState: CreateSubjectActionState,
   data: FormData
 ) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true };
+
   try {
     await prisma.subject.delete({
-      where: { id: +data.get("id")! },
+      where: { id: +id! },
     });
 
     return { success: true, error: false };
   } catch (error) {
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
 
@@ -181,47 +232,7 @@ export const createTeacher = async (
 
     return { success: true, error: false };
   } catch (error) {
-    if (error instanceof ZodError) {
-      return {
-        success: false,
-        error: true,
-        fieldErrors: error.flatten().fieldErrors,
-      };
-    }
-
-    if (isClerkAPIResponseError(error)) {
-      const messages =
-        error.errors?.map((err) => err.longMessage || err.message) || [];
-
-      return {
-        success: false,
-        error: true,
-        fieldErrors: {
-          clerk: messages,
-        },
-      };
-    }
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === "P2002") {
-        // Unique constraint failed
-        const field = (error?.meta?.target as string[])?.[0];
-        return {
-          success: false,
-          error: true,
-          fieldErrors: {
-            [field]: [`${field} is already taken`],
-          },
-        };
-      }
-    }
-
-    console.error("❌ createTeacher error:", error);
-    return {
-      success: false,
-      error: true,
-      message: "Unexpected error occurred",
-    };
+    return exceptionHandler(error);
   }
 };
 
@@ -264,38 +275,12 @@ export const updateTeacher = async (
 
     return { success: true, error: false };
   } catch (error) {
-    if (error instanceof ZodError) {
-      return {
-        success: false,
-        error: true,
-        fieldErrors: error.flatten().fieldErrors,
-      };
-    }
-
-    if (isClerkAPIResponseError(error)) {
-      const messages =
-        error.errors?.map((err) => err.longMessage || err.message) || [];
-
-      return {
-        success: false,
-        error: true,
-        fieldErrors: {
-          clerk: messages,
-        },
-      };
-    }
-
-    console.error("❌ createTeacher error:", error);
-    return {
-      success: false,
-      error: true,
-      message: "Unexpected error occurred",
-    };
+    return exceptionHandler(error);
   }
 };
 
 export const deleteTeacher = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: FormData
 ) => {
   const id = data.get("id") as string;
@@ -311,9 +296,10 @@ export const deleteTeacher = async (
 
     return { success: true, error: false };
   } catch (error) {
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
+
 // Student Actions
 
 export const createStudent = async (

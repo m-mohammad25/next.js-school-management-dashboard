@@ -3,7 +3,12 @@ import { z } from "zod";
 export const subjectSchema = z.object({
   id: z.coerce.number().optional(),
   name: z.string().min(1, { message: "subject name is required!" }),
-  teachers: z.array(z.string()), //teachersIDs
+  teachers: z
+    .array(z.string(), {
+      //teachersIDs
+      required_error: "You must select at least one teacher",
+    })
+    .min(1, "You must select at least one teacher"),
 });
 
 export type SubjectFormInputsTypes = z.infer<typeof subjectSchema>;

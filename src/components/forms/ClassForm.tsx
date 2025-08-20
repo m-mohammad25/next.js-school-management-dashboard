@@ -10,19 +10,9 @@ import { ClassFormInputsTypes, classSchema } from "../formsValidationSchemas";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { createClass, updateClass } from "../actions";
+import { FormProps } from "./types";
 
-type ClassFormProps = {
-  setOpenModal: Dispatch<SetStateAction<boolean>>;
-  type: "update" | "create";
-  data?: any;
-  relatedData?: any;
-};
-function SubjectForm({
-  setOpenModal,
-  type,
-  data,
-  relatedData,
-}: ClassFormProps) {
+function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
   const {
     register,
     handleSubmit,
