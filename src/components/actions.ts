@@ -16,11 +16,14 @@ import {
   createStudentSchema,
   updateStudentSchema,
   subjectSchema,
+  classSchema,
+  examSchema,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole } from "@/lib/utils";
 import { ZodError } from "zod";
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
+import { success } from "zod/v4-mini";
 
 type CreateSubjectActionState = { success: boolean; error: boolean };
 export type ActionState = {
@@ -147,48 +150,55 @@ export const deleteSubject = async (
 // Class Actions
 
 export const createClass = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: ClassFormInputsTypes
 ) => {
+  const parsed = classSchema.parse(data);
+
   try {
     await prisma.class.create({
-      data,
+      data: parsed,
     });
 
     return { success: true, error: false };
   } catch (error) {
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
 
 export const updateClass = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: ClassFormInputsTypes
 ) => {
+  const parsed = classSchema.parse(data);
+
   try {
     await prisma.class.update({
-      where: { id: data.id },
-      data,
+      where: { id: parsed.id },
+      data: parsed,
     });
 
     return { success: true, error: false };
   } catch (error) {
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
 
 export const deleteClass = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: FormData
 ) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true };
+
   try {
     await prisma.class.delete({
-      where: { id: +data.get("id")! },
+      where: { id: +id! },
     });
 
     return { success: true, error: false };
   } catch (error) {
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
 
@@ -418,51 +428,58 @@ export const deleteStudent = async (
 };
 
 export const createExam = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: ExamFormInputsTypes
 ) => {
   const role = await getUserRole();
   const userId = await getUserId();
+
+  const parsed = examSchema.parse(data);
 
   try {
     if (role === "teacher") {
       const teacherLesson = await prisma.lesson.findFirst({
         where: {
           teacherId: userId!,
-          id: data.lessonId,
+          id: parsed.lessonId,
         },
       });
 
       if (!teacherLesson) {
-        return { success: false, error: true };
+        return {
+          success: false,
+          error: true,
+          message: "teachers can add exams only to their own lessons!",
+        };
       }
     }
 
     await prisma.exam.create({
       data: {
-        title: data.title,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        lessonId: data.lessonId,
+        title: parsed.title,
+        startTime: parsed.startTime,
+        endTime: parsed.endTime,
+        lessonId: parsed.lessonId,
       },
     });
 
     // revalidatePath("/list/subjects");
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
-    return { success: false, error: true };
+    return exceptionHandler(err);
   }
 };
 
 // exam actions
 
 export const updateExam = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: ExamFormInputsTypes
 ) => {
   const role = await getUserRole();
   const userId = await getUserId();
+
+  const parsed = examSchema.parse(data);
 
   try {
     if (role === "teacher") {
@@ -474,27 +491,30 @@ export const updateExam = async (
       });
 
       if (!teacherLesson) {
-        return { success: false, error: true };
+        return {
+          success: false,
+          error: true,
+          message: "teachers can edit only their own exams!",
+        };
       }
     }
 
     await prisma.exam.update({
       where: {
-        id: data.id,
+        id: parsed.id,
       },
       data: {
-        title: data.title,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        lessonId: data.lessonId,
+        title: parsed.title,
+        startTime: parsed.startTime,
+        endTime: parsed.endTime,
+        lessonId: parsed.lessonId,
       },
     });
 
     // revalidatePath("/list/subjects");
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
-    return { success: false, error: true };
+    return exceptionHandler(err);
   }
 };
 
@@ -503,6 +523,7 @@ export const deleteExam = async (
   data: FormData
 ) => {
   const id = data.get("id") as string;
+  if (!id) return { success: false, error: true, message: "ID is missing!" };
 
   const role = await getUserRole();
   const userId = await getUserId();
@@ -518,7 +539,6 @@ export const deleteExam = async (
     // revalidatePath("/list/subjects");
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
-    return { success: false, error: true };
+    return exceptionHandler(err);
   }
 };

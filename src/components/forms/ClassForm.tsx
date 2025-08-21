@@ -1,18 +1,23 @@
 "use client";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { useEffect } from "react";
 
 import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import InputField from "@/components/InputField";
 import { ClassFormInputsTypes, classSchema } from "../formsValidationSchemas";
+
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+
 import { createClass, updateClass } from "../actions";
+
+import InputField from "@/components/InputField";
 import { FormProps } from "./types";
 
 function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -29,7 +34,6 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
     }
   );
 
-  const router = useRouter();
   useEffect(() => {
     if (state.success) {
       toast(`Class has been ${type}d sucessfully!`);
@@ -54,7 +58,7 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
           name="name"
           defaultValue={data?.name}
           register={register}
-          error={errors?.name}
+          error={errors?.name || state?.fieldErrors?.name?.[0]}
         />
 
         <InputField
@@ -62,7 +66,7 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
           name="capacity"
           defaultValue={data?.capacity}
           register={register}
-          error={errors?.capacity}
+          error={errors?.capacity || state?.fieldErrors?.capacity?.[0]}
         />
         {data && (
           <InputField
@@ -70,7 +74,7 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
             name="id"
             defaultValue={data?.id}
             register={register}
-            error={errors?.id}
+            error={errors?.id || state?.fieldErrors?.id?.[0]}
             hidden
           />
         )}
@@ -82,6 +86,7 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register("supervisorId")}
+            defaultValue={data?.supervisorId}
           >
             {relatedData.teachers.map(
               (teacher: { id: string; name: string; surname: string }) => (
@@ -93,9 +98,14 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
               )
             )}
           </select>
-          {errors.supervisorId?.message && (
+          {errors?.supervisorId?.message && (
             <p className="text-xs text-red-400">
               {errors.supervisorId?.message}
+            </p>
+          )}
+          {state?.fieldErrors?.supervisorId?.[0] && (
+            <p className="text-xs text-red-400">
+              {state?.fieldErrors?.supervisorId?.[0]}
             </p>
           )}
         </div>
@@ -107,6 +117,7 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register("gradeId")}
+            defaultValue={data?.gradeId}
           >
             {relatedData.grades.map((grade: { id: number; level: number }) => (
               <option
@@ -119,11 +130,14 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
           {errors.gradeId?.message && (
             <p className="text-xs text-red-400">{errors.gradeId?.message}</p>
           )}
+          {state?.fieldErrors?.gradeId?.[0] && (
+            <p className="text-xs text-red-400">
+              {state?.fieldErrors?.gradeId?.[0]}
+            </p>
+          )}
         </div>
       </div>
-      {state.error && (
-        <span className="text-red-500">something went wrong!</span>
-      )}
+      {state?.message && <span className="text-red-500">{state?.message}</span>}
 
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "create" : "update"}

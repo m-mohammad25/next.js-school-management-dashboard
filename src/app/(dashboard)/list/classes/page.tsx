@@ -54,7 +54,7 @@ async function ClassesListPage({
     >
       <td className="flex items-center gap-4 p-4">{classItem.name}</td>
       <td className="hidden md:table-cell">{classItem.capacity}</td>
-      <td className="hidden md:table-cell">{classItem.name[0]}</td>
+      <td className="hidden md:table-cell">{classItem.gradeId}</td>
       <td className="hidden md:table-cell">{`${classItem.supervisor.name} ${classItem.supervisor.surname}`}</td>
       <td>
         <div className="flex items-center gap-2">

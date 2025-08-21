@@ -1,20 +1,29 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+
+import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
+
+import { useRouter } from "next/navigation";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import InputField from "../InputField";
+
 import {
   ExamFormInputsTypes,
   examSchema,
 } from "@/components/formsValidationSchemas";
 import { createExam, updateExam } from "@/components/actions";
-import { useFormState } from "react-dom";
-import { Dispatch, SetStateAction, useEffect } from "react";
+
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+
 import { FormProps } from "./types";
 
 const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -34,11 +43,8 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
   );
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
     formAction(data);
   });
-
-  const router = useRouter();
 
   useEffect(() => {
     if (state.success) {
@@ -62,14 +68,14 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
           name="title"
           defaultValue={data?.title}
           register={register}
-          error={errors?.title}
+          error={errors?.title || state?.fieldErrors?.title?.[0]}
         />
         <InputField
           label="Start Date"
           name="startTime"
           defaultValue={data?.startTime}
           register={register}
-          error={errors?.startTime}
+          error={errors?.startTime || state?.fieldErrors?.startTime?.[0]}
           type="datetime-local"
         />
         <InputField
@@ -77,7 +83,7 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
           name="endTime"
           defaultValue={data?.endTime}
           register={register}
-          error={errors?.endTime}
+          error={errors?.endTime || state?.fieldErrors?.endTime?.[0]}
           type="datetime-local"
         />
         {data && (
@@ -86,7 +92,7 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
             name="id"
             defaultValue={data?.id}
             register={register}
-            error={errors?.id}
+            error={errors?.id || state?.fieldErrors?.id?.[0]}
             hidden
           />
         )}
@@ -95,7 +101,7 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register("lessonId")}
-            defaultValue={data?.teachers}
+            defaultValue={data?.lessonId}
           >
             {lessons.map((lesson: { id: number; name: string }) => (
               <option value={lesson.id} key={lesson.id}>
@@ -108,11 +114,14 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
               {errors.lessonId.message.toString()}
             </p>
           )}
+          {state?.fieldErrors?.lessonId?.[0] && (
+            <p className="text-xs text-red-400">
+              {state?.fieldErrors?.lessonId?.[0]}
+            </p>
+          )}
         </div>
       </div>
-      {state.error && (
-        <span className="text-red-500">Something went wrong!</span>
-      )}
+      {state?.message && <span className="text-red-500">{state?.message}</span>}
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "Create" : "Update"}
       </button>
