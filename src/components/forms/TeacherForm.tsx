@@ -242,7 +242,9 @@ function TeacherForm({ type, data, relatedData, setOpenModal }: FormProps) {
             <p className="text-xs text-red-400">{errors.subjects?.message}</p>
           )}
           {state?.fieldErrors?.subjects?.[0] && (
-            <p className="text-xs text-red-400">{errors.subjects?.message}</p>
+            <p className="text-xs text-red-400">
+              {state?.fieldErrors?.subjects?.[0]}
+            </p>
           )}
         </div>
       </div>

@@ -18,6 +18,10 @@ import {
   subjectSchema,
   classSchema,
   examSchema,
+  CreateParentInputs,
+  createParentSchema,
+  UpdateParentInputs,
+  updateParentSchema,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole } from "@/lib/utils";
@@ -313,7 +317,7 @@ export const deleteTeacher = async (
 // Student Actions
 
 export const createStudent = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: CreateStudentInputs
 ) => {
   try {
@@ -326,7 +330,7 @@ export const createStudent = async (
 
     if (classItem && classItem.capacity === classItem._count.students) {
       // class is full
-      return { success: false, error: false };
+      return { success: false, error: false, message: "Class is full" };
     }
     const clerk = await clerkClient();
     const user = await clerk.users.createUser({
@@ -358,13 +362,12 @@ export const createStudent = async (
 
     return { success: true, error: false };
   } catch (error) {
-    console.log(error);
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
 
 export const updateStudent = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: UpdateStudentInputs
 ) => {
   try {
@@ -401,8 +404,7 @@ export const updateStudent = async (
 
     return { success: true, error: false };
   } catch (error) {
-    console.log(error);
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
 
@@ -411,7 +413,7 @@ export const deleteStudent = async (
   data: FormData
 ) => {
   const id = data.get("id") as string;
-  if (!id) return { success: false, error: true };
+  if (!id) return { success: false, error: true, message: "ID is missing!" };
 
   try {
     const clerk = await clerkClient();
@@ -423,10 +425,101 @@ export const deleteStudent = async (
 
     return { success: true, error: false };
   } catch (error) {
-    return { success: false, error: true };
+    return exceptionHandler(error);
   }
 };
 
+export const createParent = async (
+  currentState: ActionState,
+  data: CreateParentInputs
+) => {
+  try {
+    const parsed = createParentSchema.parse(data);
+
+    const clerk = await clerkClient();
+    const user = await clerk.users.createUser({
+      username: parsed.username,
+      password: parsed.password,
+      firstName: parsed.name,
+      lastName: parsed.surname,
+      publicMetadata: { role: "parent" },
+    });
+
+    await prisma.parent.create({
+      data: {
+        id: user.id,
+        username: parsed.username,
+        name: parsed.name,
+        surname: parsed.surname,
+        email: parsed.email,
+        phone: parsed.phone,
+        address: parsed.address,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    return exceptionHandler(error);
+  }
+};
+
+export const updateParent = async (
+  currentState: ActionState,
+  data: UpdateParentInputs
+) => {
+  try {
+    const parsed = updateParentSchema.parse(data);
+
+    const clerk = await clerkClient();
+    const user = await clerk.users.updateUser(parsed.id!, {
+      ...(parsed.password !== "" && { password: parsed.password }),
+      username: parsed.username,
+      firstName: parsed.name,
+      lastName: parsed.surname,
+      publicMetadata: { role: "parent" },
+    });
+
+    await prisma.parent.update({
+      where: { id: parsed.id },
+      data: {
+        id: user.id,
+        username: parsed.username,
+        name: parsed.name,
+        surname: parsed.surname,
+        email: parsed.email,
+        phone: parsed.phone,
+        address: parsed.address,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    return exceptionHandler(error);
+  }
+};
+
+export const deleteParent = async (
+  currentState: CreateSubjectActionState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true, message: "ID is missing!" };
+
+  try {
+    const clerk = await clerkClient();
+    await clerk.users.deleteUser(id);
+
+    await prisma.parent.delete({
+      where: { id: id },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    return exceptionHandler(error);
+  }
+};
+
+// Exam Actions
 export const createExam = async (
   currentState: ActionState,
   data: ExamFormInputsTypes

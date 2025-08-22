@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
 
@@ -77,14 +77,14 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
           name="username"
           defaultValue={data?.username}
           register={register}
-          error={errors?.username}
+          error={errors?.username || state?.fieldErrors?.username?.[0]}
         />
         <InputField
           label="Email"
           name="email"
           defaultValue={data?.email}
           register={register}
-          error={errors?.email}
+          error={errors?.email || state?.fieldErrors?.email?.[0]}
         />
         <InputField
           label="Password"
@@ -92,7 +92,7 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
           type="password"
           defaultValue={data?.password}
           register={register}
-          error={errors?.password}
+          error={errors?.password || state?.fieldErrors?.password?.[0]}
         />
       </div>
       <span className="text-sm text-gray-400 font-medium">
@@ -147,42 +147,42 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
           name="name"
           defaultValue={data?.name}
           register={register}
-          error={errors?.name}
+          error={errors?.name || state?.fieldErrors?.name?.[0]}
         />
         <InputField
           label="Surname"
           name="surname"
           defaultValue={data?.surname}
           register={register}
-          error={errors?.surname}
+          error={errors?.surname || state?.fieldErrors?.surname?.[0]}
         />
         <InputField
           label="Phone"
           name="phone"
           defaultValue={data?.phone}
           register={register}
-          error={errors?.phone}
+          error={errors?.phone || state?.fieldErrors?.phone?.[0]}
         />
         <InputField
           label="Address"
           name="address"
           defaultValue={data?.address}
           register={register}
-          error={errors?.address}
+          error={errors?.address || state?.fieldErrors?.address?.[0]}
         />
         <InputField
           label="Blood Type"
           name="bloodType"
           defaultValue={data?.bloodType}
           register={register}
-          error={errors?.bloodType}
+          error={errors?.bloodType || state?.fieldErrors?.bloodType?.[0]}
         />
         <InputField
           label="Birthday"
           name="birthday"
           defaultValue={data?.birthday.toISOString().split("T")[0]}
           register={register}
-          error={errors?.birthday}
+          error={errors?.birthday || state?.fieldErrors?.birthday?.[0]}
           type="date"
         />
         <InputField
@@ -190,7 +190,7 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
           name="parentId"
           defaultValue={data?.parentId}
           register={register}
-          error={errors.parentId}
+          error={errors.parentId || state?.fieldErrors?.parentId?.[0]}
         />
         {data && (
           <InputField
@@ -198,7 +198,7 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
             name="id"
             defaultValue={data?.id}
             register={register}
-            error={errors?.id}
+            error={errors?.id || state?.fieldErrors?.id?.[0]}
             hidden
           />
         )}
@@ -219,6 +219,11 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
           </select>
           {errors.sex?.message && (
             <p className="text-xs text-red-400">{errors.sex?.message}</p>
+          )}
+          {state?.fieldErrors?.sex?.[0] && (
+            <p className="text-xs text-red-400">
+              {state?.fieldErrors?.sex?.[0]}
+            </p>
           )}
         </div>
 
@@ -241,6 +246,11 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
           </select>
           {errors.gradeId?.message && (
             <p className="text-xs text-red-400">{errors.gradeId?.message}</p>
+          )}
+          {state?.fieldErrors?.gradeId?.[0] && (
+            <p className="text-xs text-red-400">
+              {state?.fieldErrors?.gradeId?.[0]}
+            </p>
           )}
         </div>
 
@@ -271,10 +281,16 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
           {errors.classId?.message && (
             <p className="text-xs text-red-400">{errors.classId?.message}</p>
           )}
+          {state?.fieldErrors?.classId?.[0] && (
+            <p className="text-xs text-red-400">
+              {state?.fieldErrors?.classId?.[0]}
+            </p>
+          )}
         </div>
       </div>
-      {state.error && (
-        <span className="text-red-500">something went wrong!</span>
+      {state?.message && <span className="text-red-500">{state.message}</span>}
+      {state?.fieldErrors?.clerk && (
+        <span className="text-red-500">{state?.fieldErrors?.clerk?.[0]}</span>
       )}
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "create" : "update"}

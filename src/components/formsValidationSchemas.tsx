@@ -98,6 +98,38 @@ export const updateStudentSchema = baseStudentSchema.extend({
 export type CreateStudentInputs = z.infer<typeof createStudentSchema>;
 export type UpdateStudentInputs = z.infer<typeof updateStudentSchema>;
 
+const baseParentSchema = z.object({
+  id: z.string().optional(),
+  username: z
+    .string()
+    .min(3, { message: "Username must be at least 3 characters long!" })
+    .max(20, { message: "Username can be 20 characters at most" }),
+  email: z
+    .string()
+    .email({ message: "Invalid email address" })
+    .optional()
+    .or(z.literal("")),
+  name: z.string().min(1, { message: "Name is required" }),
+  surname: z.string().min(1, { message: "Surname is required" }),
+  phone: z.string(),
+  address: z.string().min(1, { message: "Address is required" }),
+});
+
+// Create schema → password required
+export const createParentSchema = baseParentSchema.extend({
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters" }),
+});
+
+// Update schema → password optional
+export const updateParentSchema = baseParentSchema.extend({
+  password: z.string().min(8).optional().or(z.literal("")),
+});
+
+export type CreateParentInputs = z.infer<typeof createParentSchema>;
+export type UpdateParentInputs = z.infer<typeof updateParentSchema>;
+
 export const examSchema = z.object({
   id: z.coerce.number().optional(),
   title: z.string().min(1, { message: "Title name is required!" }),

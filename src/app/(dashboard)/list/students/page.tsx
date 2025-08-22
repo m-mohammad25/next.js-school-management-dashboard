@@ -75,7 +75,7 @@ async function StudentsListsPage({
       </td>
 
       <td className="hidden md:table-cell">{student.username}</td>
-      <td className="hidden md:table-cell">{student.class.name[0]}</td>
+      <td className="hidden md:table-cell">{student.gradeId}</td>
       <td className="hidden md:table-cell">{student.phone}</td>
       <td className="hidden md:table-cell">{student.address}</td>
 

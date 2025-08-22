@@ -9,6 +9,7 @@ import {
   deleteSubject,
   deleteTeacher,
   deleteExam,
+  deleteParent,
 } from "./actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -21,7 +22,7 @@ const deleteActionMap = {
   student: deleteStudent,
   exam: deleteExam,
   // TODO: OTHER DELETE ACTIONS
-  parent: deleteSubject,
+  parent: deleteParent,
   lesson: deleteSubject,
   assignment: deleteSubject,
   result: deleteSubject,
@@ -45,6 +46,10 @@ const ClassForm = dynamic(() => import("./forms/ClassForm"), {
 });
 
 const ExamForm = dynamic(() => import("./forms/ExamForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
+const ParentForm = dynamic(() => import("./forms/ParentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 
@@ -91,6 +96,14 @@ const forms: {
   ),
   exam: (setOpenModal, type, data, relatedData) => (
     <ExamForm
+      type={type}
+      data={data}
+      setOpenModal={setOpenModal}
+      relatedData={relatedData}
+    />
+  ),
+  parent: (setOpenModal, type, data, relatedData) => (
+    <ParentForm
       type={type}
       data={data}
       setOpenModal={setOpenModal}
