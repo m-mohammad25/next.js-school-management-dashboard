@@ -42,8 +42,8 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
     }
   }, [state, setOpenModal, router, toast]);
 
-  const onSubmit = handleSubmit((data) => {
-    formAction(data);
+  const onSubmit = handleSubmit((formData) => {
+    formAction({ ...formData, id: data?.id });
   });
 
   return (
@@ -68,16 +68,6 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
           register={register}
           error={errors?.capacity || state?.fieldErrors?.capacity?.[0]}
         />
-        {data && (
-          <InputField
-            label="id"
-            name="id"
-            defaultValue={data?.id}
-            register={register}
-            error={errors?.id || state?.fieldErrors?.id?.[0]}
-            hidden
-          />
-        )}
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label htmlFor="supervisor" className="text-xs text-gray-500 gap-0">

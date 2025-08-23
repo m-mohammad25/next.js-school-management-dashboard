@@ -59,7 +59,7 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
   } = form;
 
   const onSubmit = handleSubmit((data) => {
-    const payload = { ...data, img: imgUrl };
+    const payload = { ...data, img: imgUrl, id: data?.id };
     formAction(payload as any);
   });
 
@@ -192,16 +192,6 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
           register={register}
           error={errors.parentId || state?.fieldErrors?.parentId?.[0]}
         />
-        {data && (
-          <InputField
-            label="Id"
-            name="id"
-            defaultValue={data?.id}
-            register={register}
-            error={errors?.id || state?.fieldErrors?.id?.[0]}
-            hidden
-          />
-        )}
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label htmlFor="sex" className="text-xs text-gray-500 gap-0">

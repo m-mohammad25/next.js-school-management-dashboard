@@ -12,30 +12,30 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "../InputField";
 
 import {
-  ExamFormInputsTypes,
-  examSchema,
+  LessonFormInputsTypes,
+  lessonSchema,
 } from "@/components/formsValidationSchemas";
-import { createExam, updateExam } from "@/components/actions";
+import { createLesson, updateLesson } from "@/components/actions";
 
 import { toast } from "react-toastify";
 
 import { FormProps } from "./types";
 
-const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
+const LessonForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
   const router = useRouter();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ExamFormInputsTypes>({
-    resolver: zodResolver(examSchema),
+  } = useForm<LessonFormInputsTypes>({
+    resolver: zodResolver(lessonSchema),
   });
 
   // AFTER REACT 19 IT'LL BE USEACTIONSTATE
 
   const [state, formAction] = useFormState(
-    type === "create" ? createExam : updateExam,
+    type === "create" ? createLesson : updateLesson,
     {
       success: false,
       error: false,
@@ -120,4 +120,4 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
   );
 };
 
-export default ExamForm;
+export default LessonForm;

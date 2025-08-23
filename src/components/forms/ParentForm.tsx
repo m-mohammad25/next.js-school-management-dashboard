@@ -54,8 +54,8 @@ function ParentForm({ type, data, setOpenModal }: FormProps) {
     formState: { errors },
   } = form;
 
-  const onSubmit = handleSubmit((data) => {
-    const payload = data;
+  const onSubmit = handleSubmit((formData) => {
+    const payload = { ...formData, id: data?.id };
     formAction(payload as any);
   });
 
@@ -123,17 +123,6 @@ function ParentForm({ type, data, setOpenModal }: FormProps) {
           register={register}
           error={errors?.address || state?.fieldErrors?.address?.[0]}
         />
-
-        {data && (
-          <InputField
-            label="Id"
-            name="id"
-            defaultValue={data?.id}
-            register={register}
-            error={errors?.id || state?.fieldErrors?.id?.[0]}
-            hidden
-          />
-        )}
       </div>
       {state?.message && <span className="text-red-500">{state.message}</span>}
       {state?.fieldErrors?.clerk && (

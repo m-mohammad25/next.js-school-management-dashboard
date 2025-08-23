@@ -139,3 +139,17 @@ export const examSchema = z.object({
 });
 
 export type ExamFormInputsTypes = z.infer<typeof examSchema>;
+
+export const lessonSchema = z.object({
+  id: z.coerce.number().optional(),
+  name: z.string().min(1, { message: "Title name is required!" }),
+  day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]),
+  startTime: z.coerce.date({ message: "Start time is required!" }),
+  endTime: z.coerce.date({ message: "End time is required!" }),
+
+  subjectId: z.coerce.number(),
+  ClassId: z.coerce.number(),
+  teacherId: z.string(),
+});
+
+export type LessonFormInputsTypes = z.infer<typeof lessonSchema>;

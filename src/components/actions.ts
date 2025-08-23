@@ -22,6 +22,8 @@ import {
   createParentSchema,
   UpdateParentInputs,
   updateParentSchema,
+  LessonFormInputsTypes,
+  lessonSchema,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole } from "@/lib/utils";
@@ -563,8 +565,6 @@ export const createExam = async (
   }
 };
 
-// exam actions
-
 export const updateExam = async (
   currentState: ActionState,
   data: ExamFormInputsTypes
@@ -630,6 +630,77 @@ export const deleteExam = async (
     });
 
     // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+// Lesson Actions
+
+export const createLesson = async (
+  currentState: ActionState,
+  data: LessonFormInputsTypes
+) => {
+  const parsed = lessonSchema.parse(data);
+
+  try {
+    await prisma.lesson.create({
+      data: {
+        name: parsed.name,
+        day: parsed.day,
+        startTime: parsed.startTime,
+        endTime: parsed.endTime,
+        subjectId: parsed.subjectId,
+        classId: parsed.ClassId,
+        teacherId: parsed.teacherId,
+      },
+    });
+    return { success: true, error: false };
+  } catch (error) {
+    return exceptionHandler(error);
+  }
+};
+
+export const updateLesson = async (
+  currentState: ActionState,
+  data: LessonFormInputsTypes
+) => {
+  const parsed = lessonSchema.parse(data);
+
+  try {
+    await prisma.lesson.update({
+      where: { id: parsed.id },
+      data: {
+        name: parsed.name,
+        day: parsed.day,
+        startTime: parsed.startTime,
+        endTime: parsed.endTime,
+        subjectId: parsed.subjectId,
+        classId: parsed.ClassId,
+        teacherId: parsed.teacherId,
+      },
+    });
+    return { success: true, error: false };
+  } catch (error) {
+    return exceptionHandler(error);
+  }
+};
+
+export const deleteLesson = async (
+  currentState: ActionState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true, message: "ID is missing!" };
+
+  try {
+    await prisma.lesson.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
     return { success: true, error: false };
   } catch (err) {
     return exceptionHandler(err);

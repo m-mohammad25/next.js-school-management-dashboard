@@ -10,6 +10,7 @@ import {
   deleteTeacher,
   deleteExam,
   deleteParent,
+  deleteLesson,
 } from "./actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -21,9 +22,9 @@ const deleteActionMap = {
   teacher: deleteTeacher,
   student: deleteStudent,
   exam: deleteExam,
-  // TODO: OTHER DELETE ACTIONS
   parent: deleteParent,
-  lesson: deleteSubject,
+  lesson: deleteLesson,
+  // TODO: OTHER DELETE ACTIONS
   assignment: deleteSubject,
   result: deleteSubject,
   attendance: deleteSubject,
@@ -119,6 +120,8 @@ function FormModal({
   id,
   relatedData,
 }: formModalContainerProps & { relatedData?: any }) {
+  const router = useRouter();
+
   const [openModal, setOpenModal] = useState(false);
 
   const Form = () => {
@@ -127,7 +130,6 @@ function FormModal({
       error: false,
     });
 
-    const router = useRouter();
     useEffect(() => {
       if (state.success) {
         toast(`${table} has been deleted sucessfully!`);
