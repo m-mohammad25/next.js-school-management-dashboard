@@ -104,12 +104,29 @@ async function FormModalContainer({
           },
           select: {
             id: true,
-            name: true,
+            // name: true,
           },
         });
 
         relatedData = { lessons: teacherLessons };
 
+        break;
+
+      case "lesson":
+        const subjects = await prisma.subject.findMany({
+          include: {
+            teachers: true,
+          },
+        });
+
+        const classes = await prisma.class.findMany({
+          select: {
+            id: true,
+            name: true,
+          },
+        });
+
+        relatedData = { subjects, classes };
         break;
 
       default:

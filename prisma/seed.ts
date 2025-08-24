@@ -80,7 +80,7 @@ async function main() {
   for (let i = 1; i <= 30; i++) {
     await prisma.lesson.create({
       data: {
-        name: `Lesson${i}`,
+        // name: `Lesson${i}`,
         day: Day[
           Object.keys(Day)[
             Math.floor(Math.random() * Object.keys(Day).length)

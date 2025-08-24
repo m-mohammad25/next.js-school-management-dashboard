@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import FormModal from "@/components/FormModal";
+import FormModalContainer from "@/components/FormModalContainer";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
@@ -54,8 +54,8 @@ async function LessonsListPage({
         <div className="flex items-center gap-2">
           {role === "admin" && (
             <>
-              <FormModal table="lesson" type="update" data={lesson} />
-              <FormModal table="lesson" type="delete" id={lesson.id} />
+              <FormModalContainer table="lesson" type="update" data={lesson} />
+              <FormModalContainer table="lesson" type="delete" id={lesson.id} />
             </>
           )}
         </div>
@@ -127,7 +127,9 @@ async function LessonsListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {role === "admin" && <FormModal table="lesson" type="create" />}
+            {role === "admin" && (
+              <FormModalContainer table="lesson" type="create" />
+            )}
           </div>
         </div>
       </div>

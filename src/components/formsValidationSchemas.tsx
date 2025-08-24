@@ -142,13 +142,24 @@ export type ExamFormInputsTypes = z.infer<typeof examSchema>;
 
 export const lessonSchema = z.object({
   id: z.coerce.number().optional(),
-  name: z.string().min(1, { message: "Title name is required!" }),
+  // name: z.string().min(1, { message: "Title name is required!" }),
   day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]),
-  startTime: z.coerce.date({ message: "Start time is required!" }),
-  endTime: z.coerce.date({ message: "End time is required!" }),
-
+  // startTime: z.coerce.date({ message: "Start time is required!" }),
+  // endTime: z.coerce.date({ message: "End time is required!" }),
+  startTime: z
+    .string()
+    .min(1, { message: "Start time is required!" })
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
+      message: "Invalid time format. Use HH:MM",
+    }),
+  endTime: z
+    .string()
+    .min(1, { message: "End time is required!" })
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
+      message: "Invalid time format. Use HH:MM",
+    }),
   subjectId: z.coerce.number(),
-  ClassId: z.coerce.number(),
+  classId: z.coerce.number(),
   teacherId: z.string(),
 });
 

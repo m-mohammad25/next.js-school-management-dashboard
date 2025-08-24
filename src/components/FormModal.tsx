@@ -15,6 +15,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { formModalContainerProps } from "./FormModalContainer";
+import LessonForm from "./forms/LessonForm";
 
 const deleteActionMap = {
   subject: deleteSubject,
@@ -105,6 +106,14 @@ const forms: {
   ),
   parent: (setOpenModal, type, data, relatedData) => (
     <ParentForm
+      type={type}
+      data={data}
+      setOpenModal={setOpenModal}
+      relatedData={relatedData}
+    />
+  ),
+  lesson: (setOpenModal, type, data, relatedData) => (
+    <LessonForm
       type={type}
       data={data}
       setOpenModal={setOpenModal}

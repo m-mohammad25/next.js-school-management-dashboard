@@ -104,10 +104,9 @@ model Subject {
 
 model Lesson {
   id        Int      @id @default(autoincrement())
-  name      String
   day       Day
-  startTime DateTime
-  endTime   DateTime
+  startTime DateTime @db.Time()
+  endTime   DateTime @db.Time()
 
   subjectId   Int
   subject     Subject      @relation(fields: [subjectId], references: [id])

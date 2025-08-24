@@ -26,7 +26,7 @@ import {
   lessonSchema,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
-import { getUserId, getUserRole } from "@/lib/utils";
+import { getUserId, getUserRole, timeStringToDate } from "@/lib/utils";
 import { ZodError } from "zod";
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { success } from "zod/v4-mini";
@@ -643,16 +643,15 @@ export const createLesson = async (
   data: LessonFormInputsTypes
 ) => {
   const parsed = lessonSchema.parse(data);
-
+  console.log(parsed);
   try {
     await prisma.lesson.create({
       data: {
-        name: parsed.name,
         day: parsed.day,
-        startTime: parsed.startTime,
-        endTime: parsed.endTime,
+        startTime: timeStringToDate(parsed.startTime),
+        endTime: timeStringToDate(parsed.endTime),
         subjectId: parsed.subjectId,
-        classId: parsed.ClassId,
+        classId: parsed.classId,
         teacherId: parsed.teacherId,
       },
     });
@@ -672,12 +671,11 @@ export const updateLesson = async (
     await prisma.lesson.update({
       where: { id: parsed.id },
       data: {
-        name: parsed.name,
         day: parsed.day,
         startTime: parsed.startTime,
         endTime: parsed.endTime,
         subjectId: parsed.subjectId,
-        classId: parsed.ClassId,
+        classId: parsed.classId,
         teacherId: parsed.teacherId,
       },
     });
