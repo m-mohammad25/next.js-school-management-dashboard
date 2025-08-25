@@ -24,6 +24,8 @@ import {
   updateParentSchema,
   LessonFormInputsTypes,
   lessonSchema,
+  AssignmentFormInputsTypes,
+  assignmentSchema,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole, timeStringToDate } from "@/lib/utils";
@@ -629,7 +631,119 @@ export const deleteExam = async (
       },
     });
 
-    // revalidatePath("/list/subjects");
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+// Assignment Actions
+export const createAssignment = async (
+  currentState: ActionState,
+  data: AssignmentFormInputsTypes
+) => {
+  const role = await getUserRole();
+  const userId = await getUserId();
+
+  const parsed = assignmentSchema.parse(data);
+
+  try {
+    if (role === "teacher") {
+      const teacherLesson = await prisma.lesson.findFirst({
+        where: {
+          teacherId: userId!,
+          id: parsed.lessonId,
+        },
+      });
+
+      if (!teacherLesson) {
+        return {
+          success: false,
+          error: true,
+          message: "teachers can add assignment only to their own lessons!",
+        };
+      }
+    }
+
+    await prisma.assignment.create({
+      data: {
+        title: parsed.title,
+        startDate: parsed.startDate,
+        dueDate: parsed.dueDate,
+        lessonId: parsed.lessonId,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+export const updateAssignment = async (
+  currentState: ActionState,
+  data: AssignmentFormInputsTypes
+) => {
+  const role = await getUserRole();
+  const userId = await getUserId();
+
+  const parsed = assignmentSchema.parse(data);
+
+  try {
+    if (role === "teacher") {
+      const teacherLesson = await prisma.lesson.findFirst({
+        where: {
+          teacherId: userId!,
+          id: data.lessonId,
+        },
+      });
+
+      if (!teacherLesson) {
+        return {
+          success: false,
+          error: true,
+          message: "teachers can edit only their own assigmnents!",
+        };
+      }
+    }
+
+    await prisma.assignment.update({
+      where: {
+        id: parsed.id,
+      },
+      data: {
+        title: parsed.title,
+        startDate: parsed.startDate,
+        dueDate: parsed.dueDate,
+        lessonId: parsed.lessonId,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+export const deleteAssignment = async (
+  currentState: CreateSubjectActionState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true, message: "ID is missing!" };
+
+  const role = await getUserRole();
+  const userId = await getUserId();
+
+  try {
+    await prisma.assignment.delete({
+      where: {
+        id: parseInt(id),
+        ...(role === "teacher" ? { lesson: { teacherId: userId! } } : {}),
+      },
+    });
+
+    // revalidatePath("/list/assignments");
     return { success: true, error: false };
   } catch (err) {
     return exceptionHandler(err);
@@ -672,8 +786,8 @@ export const updateLesson = async (
       where: { id: parsed.id },
       data: {
         day: parsed.day,
-        startTime: parsed.startTime,
-        endTime: parsed.endTime,
+        startTime: timeStringToDate(parsed.startTime),
+        endTime: timeStringToDate(parsed.endTime),
         subjectId: parsed.subjectId,
         classId: parsed.classId,
         teacherId: parsed.teacherId,

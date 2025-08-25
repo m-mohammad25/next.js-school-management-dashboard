@@ -12,31 +12,36 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "../InputField";
 
 import {
-  ExamFormInputsTypes,
-  examSchema,
+  AssignmentFormInputsTypes,
+  assignmentSchema,
 } from "@/components/formsValidationSchemas";
-import { createExam, updateExam } from "@/components/actions";
+import { createAssignment, updateAssignment } from "@/components/actions";
 
 import { toast } from "react-toastify";
 
 import { FormProps } from "./types";
 import { formatDateTimeLocal } from "@/lib/helpers";
 
-const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
+const AssignmentForm = ({
+  type,
+  data,
+  setOpenModal,
+  relatedData,
+}: FormProps) => {
   const router = useRouter();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ExamFormInputsTypes>({
-    resolver: zodResolver(examSchema),
+  } = useForm<AssignmentFormInputsTypes>({
+    resolver: zodResolver(assignmentSchema),
   });
 
   // AFTER REACT 19 IT'LL BE USEACTIONSTATE
 
   const [state, formAction] = useFormState(
-    type === "create" ? createExam : updateExam,
+    type === "create" ? createAssignment : updateAssignment,
     {
       success: false,
       error: false,
@@ -49,7 +54,9 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
 
   useEffect(() => {
     if (state.success) {
-      toast(`Exam has been ${type === "create" ? "created" : "updated"}!`);
+      toast(
+        `Assignment has been ${type === "create" ? "created" : "updated"}!`
+      );
       setOpenModal(false);
       router.refresh();
     }
@@ -60,12 +67,14 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new exam" : "Update the exam"}
+        {type === "create"
+          ? "Create a new assignment"
+          : "Update the assignment"}
       </h1>
 
       <div className="flex justify-between flex-wrap gap-4">
         <InputField
-          label="Exam title"
+          label="Assignment title"
           name="title"
           defaultValue={data?.title}
           register={register}
@@ -73,18 +82,18 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
         />
         <InputField
           label="Start Date"
-          name="startTime"
-          defaultValue={formatDateTimeLocal(data?.startTime)}
+          name="startDate"
+          defaultValue={formatDateTimeLocal(data?.startDate)}
           register={register}
-          error={errors?.startTime || state?.fieldErrors?.startTime?.[0]}
+          error={errors?.startDate || state?.fieldErrors?.startDate?.[0]}
           type="datetime-local"
         />
         <InputField
           label="End Date"
-          name="endTime"
-          defaultValue={formatDateTimeLocal(data?.endTime)}
+          name="dueDate"
+          defaultValue={formatDateTimeLocal(data?.dueDate)}
           register={register}
-          error={errors?.endTime || state?.fieldErrors?.endTime?.[0]}
+          error={errors?.dueDate || state?.fieldErrors?.dueDate?.[0]}
           type="datetime-local"
         />
 
@@ -127,4 +136,4 @@ const ExamForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
   );
 };
 
-export default ExamForm;
+export default AssignmentForm;

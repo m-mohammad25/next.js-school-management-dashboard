@@ -158,9 +158,19 @@ export const lessonSchema = z.object({
     .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
       message: "Invalid time format. Use HH:MM",
     }),
-  subjectId: z.coerce.number(),
-  classId: z.coerce.number(),
-  teacherId: z.string(),
+  subjectId: z.coerce.number().min(1, "Please select a subject!"),
+  classId: z.coerce.number().min(1, "Please select a class!"),
+  teacherId: z.string().min(1, "Please select a teacher!"),
 });
 
 export type LessonFormInputsTypes = z.infer<typeof lessonSchema>;
+
+export const assignmentSchema = z.object({
+  id: z.coerce.number().optional(),
+  title: z.string().min(1, { message: "Title name is required!" }),
+  startDate: z.coerce.date({ message: "Start time is required!" }),
+  dueDate: z.coerce.date({ message: "End time is required!" }),
+  lessonId: z.coerce.number({ message: "Lesson is required!" }),
+});
+
+export type AssignmentFormInputsTypes = z.infer<typeof assignmentSchema>;

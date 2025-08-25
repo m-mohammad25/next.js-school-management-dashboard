@@ -98,13 +98,15 @@ async function FormModalContainer({
         break;
 
       case "exam":
+      case "assignment":
         const teacherLessons = await prisma.lesson.findMany({
           where: {
             ...(role === "teacher" ? { teacherId: userId } : {}),
           },
           select: {
             id: true,
-            // name: true,
+            subject: true,
+            class: true,
           },
         });
 
