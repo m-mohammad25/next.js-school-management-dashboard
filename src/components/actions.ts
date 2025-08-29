@@ -26,6 +26,8 @@ import {
   lessonSchema,
   AssignmentFormInputsTypes,
   assignmentSchema,
+  ResultsFormInputsTypes,
+  resultsSchema,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole, timeStringToDate } from "@/lib/utils";
@@ -808,6 +810,97 @@ export const deleteLesson = async (
 
   try {
     await prisma.lesson.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+// Results Actions
+
+export const createResult = async (
+  currentState: ActionState,
+  data: ResultsFormInputsTypes
+) => {
+  const role = await getUserRole();
+  const userId = await getUserId();
+
+  const parsed = resultsSchema.parse(data);
+
+  try {
+    if (role === "teacher") {
+      const teacherExams = await prisma.exam.findFirst({
+        where: {
+          id: parsed?.examId,
+          lesson: { teacherId: userId! },
+        },
+      });
+
+      const teacherAssignments = await prisma.exam.findFirst({
+        where: {
+          id: parsed?.assignmentId,
+          lesson: { teacherId: userId! },
+        },
+      });
+
+      if (!teacherExams && !teacherAssignments) {
+        return {
+          success: false,
+          error: true,
+          message:
+            "teachers can add results only their for their own exams/assigmnents!",
+        };
+      }
+    }
+    await prisma.result.create({
+      data: {
+        score: parsed?.score,
+        studentId: parsed?.studentId,
+        examId: parsed?.examId || null,
+        assignmentId: parsed?.assignmentId || null,
+      },
+    });
+    return { success: true, error: false };
+  } catch (error) {
+    return exceptionHandler(error);
+  }
+};
+
+export const updateResult = async (
+  currentState: ActionState,
+  data: ResultsFormInputsTypes
+) => {
+  const parsed = resultsSchema.parse(data);
+
+  try {
+    await prisma.result.update({
+      where: { id: parsed.id },
+      data: {
+        score: parsed?.score,
+        studentId: parsed?.studentId,
+        examId: parsed?.examId || null,
+        assignmentId: parsed?.assignmentId || null,
+      },
+    });
+    return { success: true, error: false };
+  } catch (error) {
+    return exceptionHandler(error);
+  }
+};
+
+export const deleteResult = async (
+  currentState: ActionState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true, message: "ID is missing!" };
+
+  try {
+    await prisma.result.delete({
       where: {
         id: parseInt(id),
       },

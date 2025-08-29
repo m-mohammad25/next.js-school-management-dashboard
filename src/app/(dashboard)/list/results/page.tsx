@@ -1,5 +1,5 @@
 import Image from "next/image";
-import FormModal from "@/components/FormModal";
+import FormModalContainer from "@/components/FormModalContainer";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
@@ -10,7 +10,7 @@ import { getUserId, getUserRole } from "@/lib/utils";
 import { ITEMS_PER_PAGE } from "@/lib/settings";
 
 type ResultList = {
-  id: number;
+  resultId: number;
   title: string;
   studentName: string;
   studentSurname: string;
@@ -87,8 +87,12 @@ async function ResultsListPage({
         <div className="flex items-center gap-2">
           {(role === "admin" || role === "teacher") && (
             <>
-              <FormModal table="result" type="update" data={result} />
-              <FormModal table="result" type="delete" id={result.id} />
+              <FormModalContainer table="result" type="update" data={result} />
+              <FormModalContainer
+                table="result"
+                type="delete"
+                id={result.resultId}
+              />
             </>
           )}
         </div>
@@ -187,8 +191,12 @@ async function ResultsListPage({
     if (!assessment) return null;
 
     return {
-      id: item.id,
+      resultId: item.id,
+      examId: item.examId,
+      assignmentId: item.assignmentId,
+      // type: item.assignment ? "assignment" : "exam",
       title: assessment.title,
+      studentId: item.studentId,
       studentName: item.student.name,
       studentSurname: item.student.surname,
       teacherName: assessment.lesson.teacher.name,
@@ -216,7 +224,7 @@ async function ResultsListPage({
             </button>
 
             {(role === "admin" || role === "teacher") && (
-              <FormModal table="result" type="create" />
+              <FormModalContainer table="result" type="create" />
             )}
           </div>
         </div>

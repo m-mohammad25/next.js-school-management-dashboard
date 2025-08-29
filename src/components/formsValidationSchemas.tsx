@@ -174,3 +174,36 @@ export const assignmentSchema = z.object({
 });
 
 export type AssignmentFormInputsTypes = z.infer<typeof assignmentSchema>;
+
+export const resultsSchema = z
+  .object({
+    id: z.coerce
+      .number({
+        required_error: "Score is required",
+        invalid_type_error: "Score must be a number",
+      })
+      .optional(),
+    score: z.coerce
+      .number()
+      .min(0, { message: "score could not be less that 0" })
+      .max(100, { message: "score could not be more that 100" }),
+    studentId: z.string().min(1, { message: "please select a student" }),
+    examId: z.coerce.number().optional(),
+    assignmentId: z.coerce.number().optional(),
+  })
+  .refine(
+    (data) => !(data.examId && data.assignmentId), // cannot have both
+    {
+      message: "You cannot select both an exam and an assignment",
+      path: ["examId"],
+    }
+  )
+  .refine(
+    (data) => data.examId || data.assignmentId, // at least one required
+    {
+      message: "You must select either an exam or an assignment",
+      path: ["examId"],
+    }
+  );
+
+export type ResultsFormInputsTypes = z.infer<typeof resultsSchema>;
