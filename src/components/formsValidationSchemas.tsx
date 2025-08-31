@@ -168,8 +168,8 @@ export type LessonFormInputsTypes = z.infer<typeof lessonSchema>;
 export const assignmentSchema = z.object({
   id: z.coerce.number().optional(),
   title: z.string().min(1, { message: "Title name is required!" }),
-  startDate: z.coerce.date({ message: "Start time is required!" }),
-  dueDate: z.coerce.date({ message: "End time is required!" }),
+  startDate: z.coerce.date({ message: "Start date is required!" }),
+  dueDate: z.coerce.date({ message: "Due date is required!" }),
   lessonId: z.coerce.number({ message: "Lesson is required!" }),
 });
 
@@ -207,3 +207,22 @@ export const resultsSchema = z
   );
 
 export type ResultsFormInputsTypes = z.infer<typeof resultsSchema>;
+
+export const baseEventSchema = z.object({
+  id: z.coerce.number().optional(),
+  title: z.string().min(1, { message: "Title name is required!" }),
+  description: z.string().min(1, { message: "Description is required!" }),
+  classId: z.coerce.number().optional(),
+});
+
+export const eventSchema = baseEventSchema.extend({
+  startTime: z.coerce.date({ message: "Start time is required!" }),
+  endTime: z.coerce.date({ message: "End time is required!" }),
+});
+
+export const announcementSchema = baseEventSchema.extend({
+  date: z.coerce.date({ message: "Announcement date is required!" }),
+});
+
+export type EventFormInputsTypes = z.infer<typeof eventSchema>;
+export type AnnouncementFormInputsTypes = z.infer<typeof announcementSchema>;

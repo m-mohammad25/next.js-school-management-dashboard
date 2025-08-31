@@ -13,6 +13,7 @@ import {
   deleteLesson,
   deleteAssignment,
   deleteResult,
+  deleteEvent,
 } from "./actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -29,10 +30,10 @@ const deleteActionMap = {
   lesson: deleteLesson,
   assignment: deleteAssignment,
   result: deleteResult,
+  event: deleteEvent,
   // TODO: OTHER DELETE ACTIONS
   attendance: deleteSubject,
-  event: deleteSubject,
-  announcement: deleteSubject,
+  // announcement: deleteAnnoucement,
 };
 
 const SubjectForm = dynamic(() => import("./forms/SubjectForm"), {
@@ -64,6 +65,14 @@ const ResultsForm = dynamic(() => import("./forms/ResultsForm"), {
 const ParentForm = dynamic(() => import("./forms/ParentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
+
+const EventForm = dynamic(() => import("./forms/EventForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
+// const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
+//   loading: () => <h1>Loading...</h1>,
+// });
 
 const forms: {
   [key: string]: (
@@ -146,6 +155,22 @@ const forms: {
       relatedData={relatedData}
     />
   ),
+  event: (setOpenModal, type, data, relatedData) => (
+    <EventForm
+      type={type}
+      data={data}
+      setOpenModal={setOpenModal}
+      relatedData={relatedData}
+    />
+  ),
+  // announcement: (setOpenModal, type, data, relatedData) => (
+  //   <AnnouncementForm
+  //     type={type}
+  //     data={data}
+  //     setOpenModal={setOpenModal}
+  //     relatedData={relatedData}
+  //   />
+  // ),
 };
 
 function FormModal({

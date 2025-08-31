@@ -1,4 +1,4 @@
-import FormModal from "@/components/FormModal";
+import FormModalContainer from "@/components/FormModalContainer";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import { ITEMS_PER_PAGE } from "@/lib/settings";
 import { getUserId, getUserRole } from "@/lib/utils";
 import { Class, Event, Prisma } from "@prisma/client";
+
 import Image from "next/image";
 
 type EventList = Event & { class: Class };
@@ -81,8 +82,8 @@ async function EventsListPage({
         <div className="flex items-center gap-2">
           {role === "admin" && (
             <>
-              <FormModal table="event" type="update" data={event} />
-              <FormModal table="event" type="delete" id={event.id} />
+              <FormModalContainer table="event" type="update" data={event} />
+              <FormModalContainer table="event" type="delete" id={event.id} />
             </>
           )}
         </div>
@@ -117,13 +118,14 @@ async function EventsListPage({
     student: { students: { some: { id: userId! } } },
     parent: { students: { some: { parentId: userId! } } },
   };
-
-  query.OR = [
-    { classId: null },
-    {
-      class: roleConditions[role as keyof typeof roleConditions] || {}, // {} fetch every thing in case the role of admin
-    },
-  ];
+  if (role !== "admin") {
+    query.OR = [
+      { classId: null },
+      {
+        class: roleConditions[role as keyof typeof roleConditions] || {}, // {} fetch every thing in case the role of admin
+      },
+    ];
+  }
 
   const [data, count] = await prisma.$transaction([
     prisma.event.findMany({
@@ -156,7 +158,9 @@ async function EventsListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {role === "admin" && <FormModal table="event" type="create" />}
+            {role === "admin" && (
+              <FormModalContainer table="event" type="create" />
+            )}
           </div>
         </div>
       </div>

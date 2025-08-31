@@ -28,6 +28,8 @@ import {
   assignmentSchema,
   ResultsFormInputsTypes,
   resultsSchema,
+  EventFormInputsTypes,
+  eventSchema,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole, timeStringToDate } from "@/lib/utils";
@@ -903,6 +905,80 @@ export const deleteResult = async (
     await prisma.result.delete({
       where: {
         id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+// Event Actions
+export const createEvent = async (
+  currentState: ActionState,
+  data: EventFormInputsTypes
+) => {
+  const parsed = eventSchema.parse(data);
+
+  try {
+    await prisma.event.create({
+      data: {
+        title: parsed.title,
+        description: parsed.description,
+        startTime: parsed.startTime,
+        endTime: parsed.endTime,
+        ...(parsed.classId && { classId: parsed.classId }),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+export const updateEvent = async (
+  currentState: ActionState,
+  data: EventFormInputsTypes
+) => {
+  const parsed = eventSchema.parse(data);
+
+  try {
+    await prisma.event.update({
+      where: { id: parsed.id },
+      data: {
+        title: parsed.title,
+        description: parsed.description,
+        startTime: parsed.startTime,
+        endTime: parsed.endTime,
+        ...(parsed.classId && { classId: parsed.classId }),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+export const deleteEvent = async (
+  currentState: CreateSubjectActionState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true, message: "ID is missing!" };
+
+  const role = await getUserRole();
+  const userId = await getUserId();
+
+  try {
+    await prisma.event.delete({
+      where: {
+        id: parseInt(id),
+        ...(role === "teacher"
+          ? { class: { lessons: { some: { teacherId: userId! } } } }
+          : {}),
       },
     });
 
