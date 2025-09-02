@@ -30,12 +30,13 @@ import {
   resultsSchema,
   EventFormInputsTypes,
   eventSchema,
+  AnnouncementFormInputsTypes,
+  announcementSchema,
 } from "./formsValidationSchemas";
 import { clerkClient } from "@clerk/nextjs/server";
 import { getUserId, getUserRole, timeStringToDate } from "@/lib/utils";
 import { ZodError } from "zod";
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
-import { success } from "zod/v4-mini";
 
 type CreateSubjectActionState = { success: boolean; error: boolean };
 export type ActionState = {
@@ -142,7 +143,7 @@ export const updateSubject = async (
 };
 
 export const deleteSubject = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: FormData
 ) => {
   const id = data.get("id") as string;
@@ -417,7 +418,7 @@ export const updateStudent = async (
 };
 
 export const deleteStudent = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: FormData
 ) => {
   const id = data.get("id") as string;
@@ -507,7 +508,7 @@ export const updateParent = async (
 };
 
 export const deleteParent = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: FormData
 ) => {
   const id = data.get("id") as string;
@@ -617,10 +618,7 @@ export const updateExam = async (
   }
 };
 
-export const deleteExam = async (
-  currentState: CreateSubjectActionState,
-  data: FormData
-) => {
+export const deleteExam = async (currentState: ActionState, data: FormData) => {
   const id = data.get("id") as string;
   if (!id) return { success: false, error: true, message: "ID is missing!" };
 
@@ -963,22 +961,82 @@ export const updateEvent = async (
 };
 
 export const deleteEvent = async (
-  currentState: CreateSubjectActionState,
+  currentState: ActionState,
   data: FormData
 ) => {
   const id = data.get("id") as string;
   if (!id) return { success: false, error: true, message: "ID is missing!" };
 
-  const role = await getUserRole();
-  const userId = await getUserId();
-
   try {
     await prisma.event.delete({
       where: {
         id: parseInt(id),
-        ...(role === "teacher"
-          ? { class: { lessons: { some: { teacherId: userId! } } } }
-          : {}),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+// Announcement Actions
+export const createAnnouncement = async (
+  currentState: ActionState,
+  data: AnnouncementFormInputsTypes
+) => {
+  const parsed = announcementSchema.parse(data);
+
+  try {
+    await prisma.announcement.create({
+      data: {
+        title: parsed.title,
+        description: parsed.description,
+        date: parsed.date,
+        ...(parsed.classId && { classId: parsed.classId }),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+export const updateAnnouncement = async (
+  currentState: ActionState,
+  data: AnnouncementFormInputsTypes
+) => {
+  const parsed = announcementSchema.parse(data);
+
+  try {
+    await prisma.announcement.update({
+      where: { id: parsed.id },
+      data: {
+        title: parsed.title,
+        description: parsed.description,
+        date: parsed.date,
+        ...(parsed.classId && { classId: parsed.classId }),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    return exceptionHandler(err);
+  }
+};
+
+export const deleteAnnoucement = async (
+  currentState: ActionState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  if (!id) return { success: false, error: true, message: "ID is missing!" };
+
+  try {
+    await prisma.announcement.delete({
+      where: {
+        id: parseInt(id),
       },
     });
 

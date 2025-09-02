@@ -14,6 +14,7 @@ import {
   deleteAssignment,
   deleteResult,
   deleteEvent,
+  deleteAnnoucement,
 } from "./actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -31,9 +32,9 @@ const deleteActionMap = {
   assignment: deleteAssignment,
   result: deleteResult,
   event: deleteEvent,
+  announcement: deleteAnnoucement,
   // TODO: OTHER DELETE ACTIONS
   attendance: deleteSubject,
-  // announcement: deleteAnnoucement,
 };
 
 const SubjectForm = dynamic(() => import("./forms/SubjectForm"), {
@@ -70,9 +71,9 @@ const EventForm = dynamic(() => import("./forms/EventForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 
-// const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
-//   loading: () => <h1>Loading...</h1>,
-// });
+const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 
 const forms: {
   [key: string]: (
@@ -163,14 +164,14 @@ const forms: {
       relatedData={relatedData}
     />
   ),
-  // announcement: (setOpenModal, type, data, relatedData) => (
-  //   <AnnouncementForm
-  //     type={type}
-  //     data={data}
-  //     setOpenModal={setOpenModal}
-  //     relatedData={relatedData}
-  //   />
-  // ),
+  announcement: (setOpenModal, type, data, relatedData) => (
+    <AnnouncementForm
+      type={type}
+      data={data}
+      setOpenModal={setOpenModal}
+      relatedData={relatedData}
+    />
+  ),
 };
 
 function FormModal({

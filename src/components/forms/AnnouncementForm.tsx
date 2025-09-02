@@ -12,10 +12,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import InputField from "../InputField";
 
 import {
-  EventFormInputsTypes,
-  eventSchema,
+  AnnouncementFormInputsTypes,
+  announcementSchema,
 } from "@/components/formsValidationSchemas";
-import { createEvent, updateEvent } from "@/components/actions";
+import { createAnnouncement, updateAnnouncement } from "@/components/actions";
 
 import { toast } from "react-toastify";
 
@@ -29,14 +29,14 @@ const EventForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<EventFormInputsTypes>({
-    resolver: zodResolver(eventSchema),
+  } = useForm<AnnouncementFormInputsTypes>({
+    resolver: zodResolver(announcementSchema),
   });
 
   // AFTER REACT 19 IT'LL BE USEACTIONSTATE
 
   const [state, formAction] = useFormState(
-    type === "create" ? createEvent : updateEvent,
+    type === "create" ? createAnnouncement : updateAnnouncement,
     {
       success: false,
       error: false,
@@ -49,7 +49,9 @@ const EventForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
 
   useEffect(() => {
     if (state.success) {
-      toast(`Event has been ${type === "create" ? "created" : "updated"}!`);
+      toast(
+        `Annoucement has been ${type === "create" ? "created" : "updated"}!`
+      );
       setOpenModal(false);
       router.refresh();
     }
@@ -60,7 +62,9 @@ const EventForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new event" : "Update the event"}
+        {type === "create"
+          ? "Create a new announcement"
+          : "Update the announcement"}
       </h1>
 
       <div className="flex justify-between flex-wrap gap-4">
@@ -80,19 +84,11 @@ const EventForm = ({ type, data, setOpenModal, relatedData }: FormProps) => {
           error={errors?.description || state?.fieldErrors?.description?.[0]}
         />
         <InputField
-          label="Start Time"
-          name="startTime"
-          defaultValue={formatDateTimeLocal(data?.startTime)}
+          label="Date"
+          name="date"
+          defaultValue={formatDateTimeLocal(data?.date)}
           register={register}
-          error={errors?.startTime || state?.fieldErrors?.startTime?.[0]}
-          type="datetime-local"
-        />
-        <InputField
-          label="End Time"
-          name="endTime"
-          defaultValue={formatDateTimeLocal(data?.endTime)}
-          register={register}
-          error={errors?.endTime || state?.fieldErrors?.endTime?.[0]}
+          error={errors?.date || state?.fieldErrors?.data?.[0]}
           type="datetime-local"
         />
 
