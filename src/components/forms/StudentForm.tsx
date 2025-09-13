@@ -22,6 +22,7 @@ import {
 import { toast } from "react-toastify";
 import { createStudent, updateStudent } from "../actions";
 import { FormProps } from "./types";
+import ParentSelect from "./ParentSelect";
 
 function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
   const [imgUrl, setImgUrl] = useState<string>(data?.img || "/noAvatar.png");
@@ -185,13 +186,27 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
           error={errors?.birthday || state?.fieldErrors?.birthday?.[0]}
           type="date"
         />
-        <InputField
+        {/* <InputField
           label="Parent Id"
           name="parentId"
           defaultValue={data?.parentId}
           register={register}
           error={errors.parentId || state?.fieldErrors?.parentId?.[0]}
-        />
+        /> */}
+        <div className="flex flex-col gap-2 w-full md:w-1/4">
+          <label htmlFor="sex" className="text-xs text-gray-500 gap-0">
+            Parent
+          </label>
+          <ParentSelect control={form.control} defaultValue={data?.parentId} />
+          {errors.parentId?.message && (
+            <p className="text-xs text-red-400">{errors.parentId?.message}</p>
+          )}
+          {state?.fieldErrors?.parentId?.[0] && (
+            <p className="text-xs text-red-400">
+              {state?.fieldErrors?.parentId?.[0]}
+            </p>
+          )}
+        </div>
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label htmlFor="sex" className="text-xs text-gray-500 gap-0">
@@ -289,7 +304,10 @@ function StudentForm({ type, data, relatedData, setOpenModal }: FormProps) {
   );
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-8">
+    <form
+      onSubmit={onSubmit}
+      className="flex flex-col gap-8 overflow-scroll md:overflow-auto px-2 max-h-[80vh] md:max-h-none"
+    >
       {formBody}
     </form>
   );
