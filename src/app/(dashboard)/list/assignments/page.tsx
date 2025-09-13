@@ -129,6 +129,7 @@ async function AssignmentsListPage({
 
     case "teacher":
       query.lesson = { teacherId: { equals: userId } };
+      break;
 
     case "student":
       query.lesson = {

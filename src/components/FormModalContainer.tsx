@@ -133,6 +133,9 @@ async function FormModalContainer({
 
       case "result":
         const exams = await prisma.exam.findMany({
+          where: {
+            ...(role === "teacher" ? { lesson: { teacherId: userId } } : {}),
+          },
           include: {
             lesson: {
               select: {
@@ -149,6 +152,9 @@ async function FormModalContainer({
         });
 
         const assignments = await prisma.assignment.findMany({
+          where: {
+            ...(role === "teacher" ? { lesson: { teacherId: userId } } : {}),
+          },
           include: {
             lesson: {
               select: {

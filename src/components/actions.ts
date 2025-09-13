@@ -595,18 +595,18 @@ export const updateExam = async (
       const role = await getUserRole();
       const userId = await getUserId();
       const parsed = examSchema.parse(parsedData);
+
       if (role === "teacher") {
-        const teacherLesson = await prisma.lesson.findFirst({
-          where: {
-            teacherId: userId!,
-            id: parsedData.lessonId,
-          },
+        const exam = await prisma.exam.findUnique({
+          where: { id: parsed.id },
+          include: { lesson: true },
         });
-        if (!teacherLesson) {
+
+        if (!exam || exam.lesson.teacherId !== userId) {
           return {
             success: false,
             error: true,
-            message: "teachers can edit only their own exams!",
+            message: "You are not allowed to update this exam.",
           };
         }
       }
@@ -634,6 +634,22 @@ export const deleteExam = async (currentState: ActionState, data: FormData) => {
         return { success: false, error: true, message: "ID is missing!" };
       const role = await getUserRole();
       const userId = await getUserId();
+
+      if (role === "teacher") {
+        const exam = await prisma.exam.findUnique({
+          where: { id: parseInt(id) },
+          include: { lesson: true },
+        });
+
+        if (!exam || exam.lesson.teacherId !== userId) {
+          return {
+            success: false,
+            error: true,
+            message: "You are not allowed to delete this exam.",
+          };
+        }
+      }
+
       await prisma.exam.delete({
         where: {
           id: parseInt(id),
@@ -696,14 +712,18 @@ export const updateAssignment = async (
       const role = await getUserRole();
       const userId = await getUserId();
       const parsed = assignmentSchema.parse(parsedData);
+
       if (role === "teacher") {
-        const teacherLesson = await prisma.lesson.findFirst({
+        const assignment = await prisma.assignment.findUnique({
           where: {
-            teacherId: userId!,
-            id: parsedData.lessonId,
+            id: parsed.id,
+          },
+          include: {
+            lesson: true,
           },
         });
-        if (!teacherLesson) {
+
+        if (!assignment || assignment.lesson.teacherId !== userId) {
           return {
             success: false,
             error: true,
@@ -738,6 +758,26 @@ export const deleteAssignment = async (
         return { success: false, error: true, message: "ID is missing!" };
       const role = await getUserRole();
       const userId = await getUserId();
+
+      if (role === "teacher") {
+        const assignment = await prisma.assignment.findUnique({
+          where: {
+            id: parseInt(id),
+          },
+          include: {
+            lesson: true,
+          },
+        });
+
+        if (!assignment || assignment.lesson.teacherId !== userId) {
+          return {
+            success: false,
+            error: true,
+            message: "teachers can delete only their own assigmnents!",
+          };
+        }
+      }
+
       await prisma.assignment.delete({
         where: {
           id: parseInt(id),
@@ -830,6 +870,7 @@ export const createResult = async (
       const role = await getUserRole();
       const userId = await getUserId();
       const parsed = resultsSchema.parse(parsedData);
+
       if (role === "teacher") {
         const teacherExams = await prisma.exam.findFirst({
           where: {
@@ -873,7 +914,40 @@ export const updateResult = async (
 ) => {
   return protectedAction(
     async (parsedData) => {
+      const role = await getUserRole();
+      const userId = await getUserId();
       const parsed = resultsSchema.parse(parsedData);
+
+      if (role === "teacher") {
+        const result = await prisma.result.findUnique({
+          where: {
+            id: parsed.id,
+            OR: [
+              {
+                exam: {
+                  lesson: {
+                    teacherId: userId,
+                  },
+                },
+              },
+              {
+                assignment: {
+                  lesson: { teacherId: userId },
+                },
+              },
+            ],
+          },
+        });
+
+        if (!result) {
+          return {
+            success: false,
+            error: true,
+            message:
+              "teachers can modify results only their for their own exams/assigmnents!",
+          };
+        }
+      }
       await prisma.result.update({
         where: { id: parsed.id },
         data: {
@@ -897,8 +971,42 @@ export const deleteResult = async (
   return protectedAction(
     async (formData) => {
       const id = formData.get("id") as string;
+      const role = await getUserRole();
+      const userId = await getUserId();
+
       if (!id)
         return { success: false, error: true, message: "ID is missing!" };
+
+      if (role === "teacher") {
+        const result = await prisma.result.findUnique({
+          where: {
+            id: +id,
+            OR: [
+              {
+                exam: {
+                  lesson: {
+                    teacherId: userId,
+                  },
+                },
+              },
+              {
+                assignment: {
+                  lesson: { teacherId: userId },
+                },
+              },
+            ],
+          },
+        });
+
+        if (!result) {
+          return {
+            success: false,
+            error: true,
+            message:
+              "teachers can delete results only their for their own exams/assigmnents!",
+          };
+        }
+      }
       await prisma.result.delete({
         where: { id: parseInt(id) },
       });
