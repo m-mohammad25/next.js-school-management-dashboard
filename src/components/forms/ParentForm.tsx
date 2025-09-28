@@ -135,7 +135,10 @@ function ParentForm({ type, data, setOpenModal }: FormProps) {
   );
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-8">
+    <form
+      onSubmit={onSubmit}
+      className="flex flex-col gap-8 overflow-scroll md:overflow-auto px-2 max-h-[80vh] md:max-h-none"
+    >
       {formBody}
     </form>
   );

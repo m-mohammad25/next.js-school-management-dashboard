@@ -79,16 +79,18 @@ async function StudentsListsPage({
       <td className="hidden md:table-cell">{student.phone}</td>
       <td className="hidden md:table-cell">{student.address}</td>
 
-      <td className="flex items-center gap-2">
-        <Link href={`/list/students/${student.id}`}>
-          <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaSky">
-            <Image src="/view.png" alt="view" width={16} height={16} />
-          </button>
-        </Link>
+      <td className="w-0 whitespace-nowrap">
+        <div className="flex items-center gap-2">
+          <Link href={`/list/students/${student.id}`}>
+            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaSky">
+              <Image src="/view.png" alt="view" width={16} height={16} />
+            </button>
+          </Link>
 
-        {role == "admin" && (
-          <FormModalContainer table="student" type="delete" id={student.id} />
-        )}
+          {role == "admin" && (
+            <FormModalContainer table="student" type="delete" id={student.id} />
+          )}
+        </div>
       </td>
     </tr>
   );

@@ -233,8 +233,14 @@ function FormModal({
         <Image src={`/${type}.png`} alt={`${type}`} width={16} height={16} />
       </button>
       {openModal && (
-        <div className="fixed top-0 left-0 w-screen h-screen z-50 bg-black bg-opacity-60 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-md relative w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
+        <div
+          className="fixed top-0 left-0 w-screen h-screen z-50 bg-black bg-opacity-60 flex items-center justify-center"
+          onClick={() => setOpenModal(false)}
+        >
+          <div
+            className="bg-white p-4 rounded-md relative w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Form />
             <div className="absolute top-4 right-4 cursor-pointer">
               <Image
