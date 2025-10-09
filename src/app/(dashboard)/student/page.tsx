@@ -7,6 +7,7 @@ import { getUserId } from "@/lib/utils";
 
 const StudentPage = async () => {
   const studentId = await getUserId();
+
   const classItem = await prisma.student.findUnique({
     where: {
       id: studentId,
@@ -15,6 +16,7 @@ const StudentPage = async () => {
       classId: true,
     },
   });
+
   return (
     <div className="flex flex-col xl:flex-row p-4 gap-4">
       {/* Left  */}

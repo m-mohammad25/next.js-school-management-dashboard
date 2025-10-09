@@ -16,7 +16,7 @@ const ParentPage = async () => {
       <div className="w-full xl:w-2/3">
         <div className="bg-white h-full p-4 rounded-md">
           {children.map((child) => (
-            <div className="mb-5">
+            <div key={child.id} className="mb-5">
               <h1 className="text-xl font-semibold">
                 Schedule {`${child.name}`}
               </h1>

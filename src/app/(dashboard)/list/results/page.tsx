@@ -5,7 +5,7 @@ import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
 
 import prisma from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Assignment, Exam, Prisma } from "@prisma/client";
 import { getUserId, getUserRole } from "@/lib/utils";
 import { ITEMS_PER_PAGE } from "@/lib/settings";
 
@@ -70,7 +70,7 @@ async function ResultsListPage({
 
   const renderRow = (result: ResultList) => (
     <tr
-      key={result.id}
+      key={result.resultId}
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
     >
       <td className="flex items-center gap-4 p-4">{result.title}</td>
@@ -203,7 +203,8 @@ async function ResultsListPage({
       teacherSurname: assessment.lesson.teacher.surname,
       score: item.score,
       className: assessment.lesson.class.name,
-      startTime: assessment.startTime || assessment.startDate,
+      startTime:
+        (assessment as Exam).startTime || (assessment as Assignment).startDate,
     };
   });
 

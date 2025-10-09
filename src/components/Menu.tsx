@@ -1,6 +1,7 @@
 import MenuTitle from "./MenuTitle";
 import MenuItem from "./MenuItem";
 import { getUserRole } from "@/lib/utils";
+import SignOutMenuItem from "./SignOutMenuItem";
 
 const menuItems = [
   {
@@ -130,6 +131,9 @@ export default async function Menu() {
           />
           {item.items.map((item) => {
             if (item.visible.includes(role)) {
+              if (item.label === "Logout") {
+                return <SignOutMenuItem label={item.label} icon={item.icon} />;
+              }
               return (
                 <MenuItem
                   key={item.label}
