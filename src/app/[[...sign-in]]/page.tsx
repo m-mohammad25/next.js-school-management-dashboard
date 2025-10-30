@@ -1,5 +1,6 @@
 "use client";
 
+import GuestLoginButton from "@/components/GuestLoginButton";
 import * as Clerk from "@clerk/elements/common";
 import * as SignIn from "@clerk/elements/sign-in";
 import { useUser } from "@clerk/nextjs";
@@ -12,8 +13,12 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+    if (!user) return;
+
     const role = user?.publicMetadata.role;
-    if (role) {
+    if (role === "guest") {
+      router.push(`/admin`);
+    } else {
       router.push(`/${role}`);
     }
   }, [user, router]);
@@ -62,6 +67,8 @@ export default function LoginPage() {
           >
             Sign In
           </SignIn.Action>
+
+          <GuestLoginButton />
         </SignIn.Step>
       </SignIn.Root>
     </div>
