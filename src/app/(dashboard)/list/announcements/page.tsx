@@ -34,7 +34,7 @@ async function AnnouncementsListPage({
       className: "hidden md:table-cell",
     },
 
-    ...(role === "admin"
+    ...(role === "admin" || role === "guest"
       ? [
           {
             header: "Actions",
@@ -55,7 +55,7 @@ async function AnnouncementsListPage({
       </td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" && (
+          {(role === "admin" || role === "guest") && (
             <>
               <FormModalContainer
                 table="announcement"
@@ -101,7 +101,7 @@ async function AnnouncementsListPage({
     parent: { students: { some: { parentId: userId! } } },
   };
 
-  if (role !== "admin") {
+  if (role !== "admin" && role !== "guest") {
     query.OR = [
       { classId: null },
       {
@@ -142,7 +142,7 @@ async function AnnouncementsListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {role === "admin" && (
+            {(role === "admin" || role === "guest") && (
               <FormModalContainer table="announcement" type="create" />
             )}
           </div>

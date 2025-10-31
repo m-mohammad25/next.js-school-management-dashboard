@@ -36,10 +36,14 @@ const columns = [
     accessor: "date",
     className: "hidden md:table-cell",
   },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
+  ...(role === "admin" || role === "teacher" || role === "guest"
+    ? [
+        {
+          header: "Actions",
+          accessor: "action",
+        },
+      ]
+    : []),
 ];
 
 const renderRow = (exam: ExamList) => (
@@ -55,7 +59,7 @@ const renderRow = (exam: ExamList) => (
     </td>
     <td>
       <div className="flex items-center gap-2">
-        {(role === "admin" || role === "teacher") && (
+        {(role === "admin" || role === "teacher" || role === "guest") && (
           <>
             <FormModalContainer table="exam" type="update" data={exam} />
             <FormModalContainer table="exam" type="delete" id={exam.id} />
@@ -153,7 +157,7 @@ async function ExamsListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {(role === "admin" || role === "teacher") && (
+            {(role === "admin" || role === "teacher" || role === "guest") && (
               <FormModalContainer table="exam" type="create" />
             )}
           </div>

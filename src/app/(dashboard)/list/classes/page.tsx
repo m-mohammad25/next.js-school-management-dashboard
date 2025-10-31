@@ -37,7 +37,7 @@ async function ClassesListPage({
       accessor: "supervisor",
       className: "hidden md:table-cell",
     },
-    ...(role === "admin"
+    ...(role === "admin" || role === "guest"
       ? [
           {
             header: "Actions",
@@ -58,7 +58,7 @@ async function ClassesListPage({
       <td className="hidden md:table-cell">{`${classItem.supervisor.name} ${classItem.supervisor.surname}`}</td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" && (
+          {(role === "admin" || role === "guest") && (
             <>
               <FormModalContainer
                 table="class"
@@ -133,7 +133,7 @@ async function ClassesListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {role === "admin" && (
+            {(role === "admin" || role === "guest") && (
               <FormModalContainer table="class" type="create" />
             )}
           </div>

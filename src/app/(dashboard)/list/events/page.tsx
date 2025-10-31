@@ -44,7 +44,7 @@ async function EventsListPage({
       accessor: "endTime",
       className: "hidden md:table-cell",
     },
-    ...(role === "admin" || role === "teacher"
+    ...(role === "admin" || role === "teacher" || role === "guest"
       ? [
           {
             header: "Actions",
@@ -80,7 +80,7 @@ async function EventsListPage({
       </td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" && (
+          {(role === "admin" || role === "guest") && (
             <>
               <FormModalContainer table="event" type="update" data={event} />
               <FormModalContainer table="event" type="delete" id={event.id} />
@@ -118,7 +118,7 @@ async function EventsListPage({
     student: { students: { some: { id: userId! } } },
     parent: { students: { some: { parentId: userId! } } },
   };
-  if (role !== "admin") {
+  if (role !== "admin" && role !== "guset") {
     query.OR = [
       { classId: null },
       {
@@ -158,7 +158,7 @@ async function EventsListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {role === "admin" && (
+            {(role === "admin" || role === "guest") && (
               <FormModalContainer table="event" type="create" />
             )}
           </div>

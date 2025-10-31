@@ -46,7 +46,7 @@ async function StudentsListsPage({
       accessor: "address",
       className: "hidden lg:table-cell",
     },
-    ...(role === "admin"
+    ...(role === "admin" || role === "guest"
       ? [
           {
             header: "Actions",
@@ -87,7 +87,7 @@ async function StudentsListsPage({
             </button>
           </Link>
 
-          {role == "admin" && (
+          {(role === "admin" || role === "guest") && (
             <FormModalContainer table="student" type="delete" id={student.id} />
           )}
         </div>
@@ -151,7 +151,7 @@ async function StudentsListsPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {role === "admin" && (
+            {(role === "admin" || role === "guest") && (
               <FormModalContainer table="student" type="create" />
             )}
           </div>

@@ -13,7 +13,7 @@ export default function GuestLoginButton() {
         identifier: "guest",
         password: "guestP@ss12345",
       });
-      console.log("HEY!");
+
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
       } else {
@@ -24,5 +24,9 @@ export default function GuestLoginButton() {
     }
   };
 
-  return <button onClick={handleGuestLogin}>Continue as Guest</button>;
+  return (
+    <button className="text-sm text-black" onClick={handleGuestLogin}>
+      Continue as Guest
+    </button>
+  );
 }

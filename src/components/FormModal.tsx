@@ -198,6 +198,7 @@ function FormModal({
         router.refresh();
       }
     }, [state, toast, setOpenModal, router]);
+
     return type === "delete" && id ? (
       <form
         action={deleteAction}
@@ -208,6 +209,9 @@ function FormModal({
         <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none">
           Delete
         </button>
+        {state.error && (
+          <p className="text-md text-left text-red-400">{state.message}</p>
+        )}
       </form>
     ) : type === "create" || type === "update" ? (
       forms[table](setOpenModal, type, data, relatedData)

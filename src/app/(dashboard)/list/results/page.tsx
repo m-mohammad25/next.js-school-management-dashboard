@@ -58,7 +58,7 @@ async function ResultsListPage({
       accessor: "date",
       className: "hidden md:table-cell",
     },
-    ...(role === "admin" || role === "teacher"
+    ...(role === "admin" || role === "teacher" || role === "guest"
       ? [
           {
             header: "Actions",
@@ -85,7 +85,7 @@ async function ResultsListPage({
       </td>
       <td>
         <div className="flex items-center gap-2">
-          {(role === "admin" || role === "teacher") && (
+          {(role === "admin" || role === "teacher" || role === "guest") && (
             <>
               <FormModalContainer table="result" type="update" data={result} />
               <FormModalContainer
@@ -224,7 +224,7 @@ async function ResultsListPage({
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
 
-            {(role === "admin" || role === "teacher") && (
+            {(role === "admin" || role === "teacher" || role === "guest") && (
               <FormModalContainer table="result" type="create" />
             )}
           </div>
