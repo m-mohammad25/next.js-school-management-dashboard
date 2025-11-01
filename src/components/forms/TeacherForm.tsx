@@ -44,7 +44,7 @@ function TeacherForm({ type, data, relatedData, setOpenModal }: FormProps) {
       setOpenModal(false);
       router.refresh();
     }
-  }, [state, toast, setOpenModal, router]);
+  }, [state, toast, setOpenModal, router, type]);
 
   const form =
     type === "create"

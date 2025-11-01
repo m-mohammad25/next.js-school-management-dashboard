@@ -132,7 +132,13 @@ export default async function Menu() {
           {item.items.map((item) => {
             if (item.visible.includes(role)) {
               if (item.label === "Logout") {
-                return <SignOutMenuItem label={item.label} icon={item.icon} />;
+                return (
+                  <SignOutMenuItem
+                    key={item.label}
+                    label={item.label}
+                    icon={item.icon}
+                  />
+                );
               }
               return (
                 <MenuItem

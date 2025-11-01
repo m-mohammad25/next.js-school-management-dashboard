@@ -42,7 +42,7 @@ function SubjectForm({ setOpenModal, type, data, relatedData }: FormProps) {
       setOpenModal(false);
       router.refresh();
     }
-  }, [state, toast, setOpenModal, router]);
+  }, [state, toast, setOpenModal, router, type]);
 
   const onSubmit = handleSubmit((formData) => {
     formAction({ ...formData, id: data?.id });
