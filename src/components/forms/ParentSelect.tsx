@@ -23,7 +23,9 @@ export default function ParentSelect({
   useEffect(() => {
     if (defaultValue) {
       (async () => {
-        const res = await fetch(`/api/parents?id=${defaultValue}`);
+        const res = await fetch(`/api/parents?id=${defaultValue}`, {
+          cache: "no-store",
+        });
         const parent = await res.json();
         setSelectedOption({
           value: parent.id,
@@ -37,7 +39,9 @@ export default function ParentSelect({
 
   const loadOptions = debounce(
     async (inputValue: string): Promise<ParentOption[]> => {
-      const res = await fetch(`/api/parents?search=${inputValue}`);
+      const res = await fetch(`/api/parents?search=${inputValue}`, {
+        cache: "no-store",
+      });
       const data = await res.json();
       return data.map((p: any) => ({
         value: p.id,
