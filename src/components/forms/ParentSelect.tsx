@@ -1,3 +1,4 @@
+"use client";
 import AsyncSelect from "react-select/async";
 import { Controller } from "react-hook-form";
 import { useEffect, useState } from "react";
