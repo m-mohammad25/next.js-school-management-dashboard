@@ -16,11 +16,15 @@ A modern **Next.js** and **TypeScript** web application designed to revolutioniz
   - Interactive charts (progress, attendance trends)
   - Dynamic Calendars
 
+You can watch a live version of this project by clicking [here](https://next-js-school-management-dashboard.vercel.app)
+
 ![Admin Page](./src/assets/catalogue/admin_page.jpeg)
 
 ![Student Page](./src/assets/catalogue/student_page.jpeg)
 
 ![Teachers List Page](./src/assets/catalogue/teacher_list.jpeg)
+
+![Add Teacher Modal](./src/assets/catalogue/add_teacher_modal.jpeg)
 
 ![Exams Page](./src/assets/catalogue/exams_list.jpeg)
 
@@ -32,5 +36,3 @@ Besides using Next.js capabilities to implement this dashboard, I have included 
 - **React-Calendar** and **React-Big-Calendar** for displaying beatiful caledars
 
 I'm currently developing this dashboard to make it fetch real data using **Prisma** from **PostgeSQL** database already which I have deployed using **Docker**
-
-You can watch a live version of this project by clicking [here](https://next-js-school-management-dashboard.vercel.app)
